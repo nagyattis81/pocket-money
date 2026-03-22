@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react"
 import {
+  DEFAULT_GRADE_TO_AMOUNT,
   SUPPORTED_PATH
 } from "./constants"
 import {
@@ -14,26 +15,62 @@ import {
   headingStyle,
   hintStyle,
   itemListStyle,
+  settingsActionsStyle,
+  settingsButtonStyle,
+  settingsGridStyle,
+  settingsInputStyle,
+  settingsPanelStyle,
+  settingsStatusStyle,
   summaryStyle,
   tableStyle,
   textStyle
 } from "./css-properties.constants"
 import {
   buildMonthSummaries,
-  calculateAllFiveTotal,
+  calculateAllFiveTotalWithMap,
   extractMonthlyEntries,
   formatAmount,
-  isSupportedUrl
+  getStoredGradeToAmount,
+  isSupportedUrl,
+  normalizeGradeToAmountMap,
+  resetGradeToAmount,
+  saveGradeToAmount
 } from "./functions"
 import { detectLanguage, t } from "./i18n"
-import type { PopupState } from "./types"
+import type { GradeToAmountMap, PopupState, SettingsStatus } from "./types"
 
 function IndexPopup() {
   const [popupState, setPopupState] = useState<PopupState>({ status: "loading" })
+  const [gradeToAmount, setGradeToAmount] = useState<GradeToAmountMap>({ ...DEFAULT_GRADE_TO_AMOUNT })
+  const [settingsStatus, setSettingsStatus] = useState<SettingsStatus>("idle")
   const language = detectLanguage()
 
   useEffect(() => {
     document.body.style.margin = "0"
+  }, [])
+
+  useEffect(() => {
+    let disposed = false
+
+    const loadStoredSettings = async () => {
+      try {
+        const stored = await getStoredGradeToAmount()
+
+        if (!disposed) {
+          setGradeToAmount(stored)
+        }
+      } catch {
+        if (!disposed) {
+          setGradeToAmount({ ...DEFAULT_GRADE_TO_AMOUNT })
+        }
+      }
+    }
+
+    loadStoredSettings()
+
+    return () => {
+      disposed = true
+    }
   }, [])
 
   useEffect(() => {
@@ -61,10 +98,10 @@ function IndexPopup() {
             return
           }
 
-          const extractionResult = await extractMonthlyEntries(activeTab.id)
+          const extractionResult = await extractMonthlyEntries(activeTab.id, gradeToAmount)
           const monthSummaries = buildMonthSummaries(extractionResult)
           const grandTotal = monthSummaries.reduce((sum, month) => sum + month.total, 0)
-          const allFiveTotal = calculateAllFiveTotal(monthSummaries)
+          const allFiveTotal = calculateAllFiveTotalWithMap(monthSummaries, gradeToAmount)
 
           if (monthSummaries.every((month) => month.entries.length === 0)) {
             setPopupState({
@@ -101,7 +138,71 @@ function IndexPopup() {
     return () => {
       isDisposed = true
     }
-  }, [])
+  }, [gradeToAmount, language])
+
+  const handleGradeValueChange = (grade: number, rawValue: string) => {
+    const parsed = Number(rawValue)
+
+    setSettingsStatus("idle")
+    setGradeToAmount((prev) => ({
+      ...prev,
+      [grade]: Number.isFinite(parsed) ? Math.round(parsed) : 0
+    }))
+  }
+
+  const handleSaveSettings = async () => {
+    try {
+      const normalized = normalizeGradeToAmountMap(gradeToAmount)
+      await saveGradeToAmount(normalized)
+      setGradeToAmount(normalized)
+      setSettingsStatus("saved")
+    } catch {
+      setSettingsStatus("error")
+    }
+  }
+
+  const handleResetDefaults = async () => {
+    try {
+      const defaults = await resetGradeToAmount()
+      setGradeToAmount(defaults)
+      setSettingsStatus("saved")
+    } catch {
+      setSettingsStatus("error")
+    }
+  }
+
+  const renderSettingsPanel = () => (
+    <section style={settingsPanelStyle}>
+      <h2 style={headingStyle}>{t(language, "settingsTitle")}</h2>
+      <p style={textStyle}>{t(language, "settingsHint")}</p>
+      <div style={settingsGridStyle}>
+        {[1, 2, 3, 4, 5].map((grade) => (
+          <label key={grade}>
+            {grade}
+            <input
+              type="number"
+              value={gradeToAmount[grade] ?? 0}
+              onChange={(event) => handleGradeValueChange(grade, event.target.value)}
+              style={settingsInputStyle}
+            />
+          </label>
+        ))}
+      </div>
+      <div style={settingsActionsStyle}>
+        <button type="button" onClick={handleSaveSettings} style={settingsButtonStyle}>
+          {t(language, "saveSettings")}
+        </button>
+        <button type="button" onClick={handleResetDefaults} style={settingsButtonStyle}>
+          {t(language, "resetDefaults")}
+        </button>
+      </div>
+      {settingsStatus === "saved" ? (
+        <div style={settingsStatusStyle}>{t(language, "settingsSaved")}</div>
+      ) : settingsStatus === "error" ? (
+        <div style={settingsStatusStyle}>{t(language, "settingsSaveFailed")}</div>
+      ) : null}
+    </section>
+  )
 
   const renderContent = () => {
     switch (popupState.status) {
@@ -163,6 +264,7 @@ function IndexPopup() {
                 ))}
               </tbody>
             </table>
+            {renderSettingsPanel()}
           </>
         )
       case "empty":
@@ -171,6 +273,7 @@ function IndexPopup() {
             <h1 style={headingStyle}>{t(language, "emptyTitle")}</h1>
             <p style={textStyle}>{popupState.message}</p>
             <p style={hintStyle}>{popupState.url}</p>
+            {renderSettingsPanel()}
           </>
         )
       case "unsupported":
@@ -182,6 +285,7 @@ function IndexPopup() {
               {t(language, "unsupportedHintPrefix")} https://*.e-kreta.hu{SUPPORTED_PATH}
             </p>
             {popupState.url ? <p style={hintStyle}>{popupState.url}</p> : null}
+            {renderSettingsPanel()}
           </>
         )
       case "error":
@@ -189,6 +293,7 @@ function IndexPopup() {
           <>
             <h1 style={headingStyle}>{t(language, "errorTitle")}</h1>
             <p style={textStyle}>{popupState.message}</p>
+            {renderSettingsPanel()}
           </>
         )
     }

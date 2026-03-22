@@ -1,3 +1,6 @@
 {
-  "workbench.browser.enableChatTools": true
+"workbench.browser.enableChatTools": true,
+"chat.tools.terminal.autoApprove": {
+    "npm.cmd": true
+}
 }

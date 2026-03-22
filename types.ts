@@ -1,3 +1,5 @@
+export type GradeToAmountMap = Record<number, number>
+
 export type GradeEntry = {
   subject: string
   month: string
@@ -31,3 +33,5 @@ export type PopupState =
   | { status: "empty"; url: string; message: string }
   | { status: "unsupported"; url?: string }
   | { status: "error"; message: string }
+
+export type SettingsStatus = "idle" | "saved" | "error"

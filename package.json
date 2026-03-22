@@ -25,7 +25,8 @@
   },
   "manifest": {
     "permissions": [
-      "scripting"
+      "scripting",
+      "storage"
     ],
     "host_permissions": [
       "https://*.e-kreta.hu/TanuloErtekeles/Osztalyzatok*"

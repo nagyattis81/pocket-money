@@ -1,5 +1,5 @@
-import { GRADE_TO_AMOUNT, SUPPORTED_PATH } from "./constants"
-import type { MonthSummary, PageExtractionResult } from "./types"
+import { DEFAULT_GRADE_TO_AMOUNT, GRADE_STORAGE_KEY, SUPPORTED_PATH } from "./constants"
+import type { GradeToAmountMap, MonthSummary, PageExtractionResult } from "./types"
 
 export function normalizePath(pathname: string) {
   return pathname.replace(/\/+$/, "") || "/"
@@ -23,7 +23,7 @@ export function buildMonthSummaries(result: PageExtractionResult) {
 }
 
 export function calculateAllFiveTotal(monthSummaries: MonthSummary[]) {
-  const allFiveBase = GRADE_TO_AMOUNT[5]
+  const allFiveBase = DEFAULT_GRADE_TO_AMOUNT[5]
 
   return monthSummaries.reduce(
     (sum, month) =>
@@ -33,7 +33,58 @@ export function calculateAllFiveTotal(monthSummaries: MonthSummary[]) {
   )
 }
 
-export async function extractMonthlyEntries(tabId: number): Promise<PageExtractionResult> {
+export function normalizeGradeToAmountMap(input: unknown): GradeToAmountMap {
+  const fallback = DEFAULT_GRADE_TO_AMOUNT
+  const source = typeof input === "object" && input !== null ? (input as Record<string, unknown>) : {}
+  const grades = [1, 2, 3, 4, 5]
+
+  return grades.reduce<GradeToAmountMap>((acc, grade) => {
+    const rawValue = source[String(grade)] ?? source[grade]
+    const numericValue = typeof rawValue === "number" ? rawValue : Number(rawValue)
+    acc[grade] = Number.isFinite(numericValue) ? Math.round(numericValue) : fallback[grade]
+
+    return acc
+  }, { ...fallback })
+}
+
+export async function getStoredGradeToAmount(): Promise<GradeToAmountMap> {
+  const stored = await chrome.storage.local.get(GRADE_STORAGE_KEY)
+
+  return normalizeGradeToAmountMap(stored[GRADE_STORAGE_KEY])
+}
+
+export async function saveGradeToAmount(gradeToAmount: GradeToAmountMap) {
+  const normalized = normalizeGradeToAmountMap(gradeToAmount)
+
+  await chrome.storage.local.set({
+    [GRADE_STORAGE_KEY]: normalized
+  })
+}
+
+export async function resetGradeToAmount() {
+  await saveGradeToAmount(DEFAULT_GRADE_TO_AMOUNT)
+
+  return { ...DEFAULT_GRADE_TO_AMOUNT }
+}
+
+export function calculateAllFiveTotalWithMap(
+  monthSummaries: MonthSummary[],
+  gradeToAmount: GradeToAmountMap
+) {
+  const allFiveBase = gradeToAmount[5] ?? DEFAULT_GRADE_TO_AMOUNT[5]
+
+  return monthSummaries.reduce(
+    (sum, month) =>
+      sum +
+      month.entries.reduce((monthSum, entry) => monthSum + Math.round((allFiveBase * entry.weight) / 100), 0),
+    0
+  )
+}
+
+export async function extractMonthlyEntries(
+  tabId: number,
+  gradeToAmount: GradeToAmountMap
+): Promise<PageExtractionResult> {
   const [injectionResult] = await chrome.scripting.executeScript({
     target: { tabId },
     func: (gradeToAmount) => {
@@ -114,7 +165,7 @@ export async function extractMonthlyEntries(tabId: number): Promise<PageExtracti
 
       return { months, entries }
     },
-    args: [GRADE_TO_AMOUNT]
+    args: [normalizeGradeToAmountMap(gradeToAmount)]
   })
 
   if (!injectionResult?.result) {

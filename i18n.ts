@@ -18,6 +18,12 @@ export type TranslationKey =
   | "errorTitle"
   | "missingTabId"
   | "activeTabCheckFailed"
+  | "settingsTitle"
+  | "settingsHint"
+  | "saveSettings"
+  | "resetDefaults"
+  | "settingsSaved"
+  | "settingsSaveFailed"
 
 const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
   hu: {
@@ -37,7 +43,13 @@ const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
     unsupportedHintPrefix: "Nyisd meg ezt az útvonalat:",
     errorTitle: "Ellenőrzés sikertelen",
     missingTabId: "Az aktív lap azonosítója nem érhető el.",
-    activeTabCheckFailed: "Az aktív lap nem ellenőrizhető."
+    activeTabCheckFailed: "Az aktív lap nem ellenőrizhető.",
+    settingsTitle: "Jegy / Ft beállítások",
+    settingsHint: "Módosítsd az értékeket, majd mentsd el. A rendszer chrome.storage.local-ba ment.",
+    saveSettings: "Mentés",
+    resetDefaults: "Alapértékek",
+    settingsSaved: "Beállítások elmentve.",
+    settingsSaveFailed: "A mentés nem sikerült."
   },
   en: {
     loadingTitle: "e-kreta pocket money",
@@ -56,7 +68,13 @@ const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
     unsupportedHintPrefix: "Open this path:",
     errorTitle: "Check failed",
     missingTabId: "The active tab id is not available.",
-    activeTabCheckFailed: "The active tab cannot be checked."
+    activeTabCheckFailed: "The active tab cannot be checked.",
+    settingsTitle: "Grade / Ft settings",
+    settingsHint: "Update values and save them. Values are persisted in chrome.storage.local.",
+    saveSettings: "Save",
+    resetDefaults: "Defaults",
+    settingsSaved: "Settings saved.",
+    settingsSaveFailed: "Saving failed."
   }
 }
 
