@@ -42,7 +42,7 @@ export const summaryStyle: CSSProperties = {
   background: "#f0ead6",
   border: "1px solid #d6c7a1",
   fontSize: 15,
-  fontWeight: 700
+  fontWeight: 400
 }
 
 export const secondarySummaryStyle: CSSProperties = {

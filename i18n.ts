@@ -4,7 +4,6 @@ export type TranslationKey =
   | "loadingTitle"
   | "loadingMessage"
   | "summaryTitle"
-  | "excludedColumns"
   | "grandTotal"
   | "allFiveTotal"
   | "month"
@@ -25,7 +24,6 @@ const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
     loadingTitle: "e-kreta pocket money",
     loadingMessage: "Az aktív lap ellenőrzése folyamatban van.",
     summaryTitle: "Havi zsebpénz összesítő",
-    excludedColumns: "Az I, II, Átlag és Átlag (%) oszlopok kihagyva.",
     grandTotal: "Végösszeg",
     allFiveTotal: "Összeg, ha minden jegy 5-ös lenne",
     month: "Hónap",
@@ -45,7 +43,6 @@ const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
     loadingTitle: "e-kreta pocket money",
     loadingMessage: "Checking the active tab.",
     summaryTitle: "Monthly pocket money summary",
-    excludedColumns: "Columns I, II, Average and Average (%) are excluded.",
     grandTotal: "Grand total",
     allFiveTotal: "Amount if every grade had been 5",
     month: "Month",

@@ -11,7 +11,6 @@ import {
   headingStyle,
   hintStyle,
   itemListStyle,
-  secondarySummaryStyle,
   summaryStyle,
   tableStyle,
   textStyle
@@ -29,6 +28,10 @@ import type { PopupState } from "./types"
 function IndexPopup() {
   const [popupState, setPopupState] = useState<PopupState>({ status: "loading" })
   const language = detectLanguage()
+
+  useEffect(() => {
+    document.body.style.margin = "0"
+  }, [])
 
   useEffect(() => {
     let isDisposed = false
@@ -110,13 +113,9 @@ function IndexPopup() {
         return (
           <>
             <h1 style={headingStyle}>{t(language, "summaryTitle")}</h1>
-            <p style={textStyle}>{t(language, "excludedColumns")}</p>
-            <p style={hintStyle}>{popupState.url}</p>
             <div style={summaryStyle}>
-              {t(language, "grandTotal")}: {formatAmount(popupState.grandTotal)}
-            </div>
-            <div style={secondarySummaryStyle}>
-              {t(language, "allFiveTotal")}: {formatAmount(popupState.allFiveTotal)}
+              {t(language, "grandTotal")}: <strong>{formatAmount(popupState.grandTotal)}</strong> | {t(language, "allFiveTotal")}:{" "}
+              <strong>{formatAmount(popupState.allFiveTotal)}</strong>
             </div>
             <table style={tableStyle}>
               <thead>
