@@ -10,7 +10,10 @@
     "package": "plasmo package",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "knip": "knip"
+    "knip": "knip",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "plasmo": "0.90.5",
@@ -32,7 +35,9 @@
     "eslint-plugin-react-hooks": "^7.0.1",
     "knip": "^6.0.2",
     "prettier": "3.2.4",
-    "typescript": "5.3.3"
+    "typescript": "5.3.3",
+    "vitest": "^3.2.4",
+    "@vitest/coverage-v8": "^3.2.4"
   },
   "overrides": {
     "content-security-policy-parser": "0.6.0",

@@ -7,7 +7,7 @@ import prettierConfig from "eslint-config-prettier"
 
 export default [
   {
-    ignores: ["build/**", "node_modules/**", ".plasmo/**"]
+    ignores: ["build/**", "node_modules/**", ".plasmo/**", "coverage/**"]
   },
   {
     files: ["**/*.ts", "**/*.tsx"],
