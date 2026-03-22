@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react"
+import { version } from "./package.json"
 import {
   DEFAULT_CURRENCY,
   DEFAULT_GRADE_TO_AMOUNT,
@@ -382,7 +383,7 @@ function IndexPopup() {
                 </tr>
               </thead>
               <tbody>
-                {popupState.monthSummaries.map((summary) => (
+                {popupState.monthSummaries.filter((summary) => summary.entries.length > 0).map((summary) => (
                   <tr key={summary.month}>
                     <td style={bodyCellStyle}>{summary.month}</td>
                     {tableViewMode === "detailed" ? (
@@ -457,6 +458,7 @@ function IndexPopup() {
   return (
     <main style={containerStyle}>
       <section style={cardStyle}>{renderContent()}</section>
+      <p style={{ ...hintStyle, textAlign: "center", marginTop: 6 }}>v{version}</p>
     </main>
   )
 }
