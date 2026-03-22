@@ -23,10 +23,12 @@ import {
   formatAmount,
   isSupportedUrl
 } from "./functions"
+import { detectLanguage, t } from "./i18n"
 import type { PopupState } from "./types"
 
 function IndexPopup() {
   const [popupState, setPopupState] = useState<PopupState>({ status: "loading" })
+  const language = detectLanguage()
 
   useEffect(() => {
     let isDisposed = false
@@ -48,7 +50,7 @@ function IndexPopup() {
           if (!activeTab?.id) {
             setPopupState({
               status: "error",
-              message: "Az aktiv lap azonositoja nem erheto el."
+              message: t(language, "missingTabId")
             })
             return
           }
@@ -62,7 +64,7 @@ function IndexPopup() {
             setPopupState({
               status: "empty",
               url: activeUrl,
-              message: "Nem talaltam kiolvashato szamjegyes 1-5 osztalyzatokat a havi oszlopokban."
+              message: t(language, "emptyMessage")
             })
             return
           }
@@ -82,7 +84,7 @@ function IndexPopup() {
         if (!isDisposed) {
           setPopupState({
             status: "error",
-            message: "Az aktiv lap nem ellenorizheto."
+            message: t(language, "activeTabCheckFailed")
           })
         }
       }
@@ -100,28 +102,28 @@ function IndexPopup() {
       case "loading":
         return (
           <>
-            <h1 style={headingStyle}>eKreta pocket money</h1>
-            <p style={textStyle}>Az aktiv lap ellenorzese folyamatban van.</p>
+            <h1 style={headingStyle}>{t(language, "loadingTitle")}</h1>
+            <p style={textStyle}>{t(language, "loadingMessage")}</p>
           </>
         )
       case "ready":
         return (
           <>
-            <h1 style={headingStyle}>Havi zsebpenz osszesito</h1>
-            <p style={textStyle}>
-              Az `I`, `II`, `Atlag` es `Atlag (%)` oszlopok kihagyva.
-            </p>
+            <h1 style={headingStyle}>{t(language, "summaryTitle")}</h1>
+            <p style={textStyle}>{t(language, "excludedColumns")}</p>
             <p style={hintStyle}>{popupState.url}</p>
-            <div style={summaryStyle}>Vegosszeg: {formatAmount(popupState.grandTotal)}</div>
+            <div style={summaryStyle}>
+              {t(language, "grandTotal")}: {formatAmount(popupState.grandTotal)}
+            </div>
             <div style={secondarySummaryStyle}>
-              Osszeg, ha minden jegy 5-os lenne: {formatAmount(popupState.allFiveTotal)}
+              {t(language, "allFiveTotal")}: {formatAmount(popupState.allFiveTotal)}
             </div>
             <table style={tableStyle}>
               <thead>
                 <tr>
-                  <th style={headerCellStyle}>Honap</th>
-                  <th style={headerCellStyle}>Jegyek es sulyok</th>
-                  <th style={headerCellStyle}>Osszesen</th>
+                  <th style={headerCellStyle}>{t(language, "month")}</th>
+                  <th style={headerCellStyle}>{t(language, "gradesAndWeights")}</th>
+                  <th style={headerCellStyle}>{t(language, "total")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -140,7 +142,7 @@ function IndexPopup() {
                           ))}
                         </div>
                       ) : (
-                        <span style={hintStyle}>Nincs jegy</span>
+                        <span style={hintStyle}>{t(language, "noGrades")}</span>
                       )}
                     </td>
                     <td style={bodyCellStyle}>{formatAmount(summary.total)}</td>
@@ -153,7 +155,7 @@ function IndexPopup() {
       case "empty":
         return (
           <>
-            <h1 style={headingStyle}>Nincs kiolvashato jegy</h1>
+            <h1 style={headingStyle}>{t(language, "emptyTitle")}</h1>
             <p style={textStyle}>{popupState.message}</p>
             <p style={hintStyle}>{popupState.url}</p>
           </>
@@ -161,12 +163,10 @@ function IndexPopup() {
       case "unsupported":
         return (
           <>
-            <h1 style={headingStyle}>Nem tamogatott oldal</h1>
-            <p style={textStyle}>
-              A bovitmeny csak az eKreta Osztalyzatok oldalon mukodik.
-            </p>
+            <h1 style={headingStyle}>{t(language, "unsupportedTitle")}</h1>
+            <p style={textStyle}>{t(language, "unsupportedMessage")}</p>
             <p style={hintStyle}>
-              Nyisd meg ezt az utvonalat: https://*.e-kreta.hu{SUPPORTED_PATH}
+              {t(language, "unsupportedHintPrefix")} https://*.e-kreta.hu{SUPPORTED_PATH}
             </p>
             {popupState.url ? <p style={hintStyle}>{popupState.url}</p> : null}
           </>
@@ -174,7 +174,7 @@ function IndexPopup() {
       case "error":
         return (
           <>
-            <h1 style={headingStyle}>Ellenorzes sikertelen</h1>
+            <h1 style={headingStyle}>{t(language, "errorTitle")}</h1>
             <p style={textStyle}>{popupState.message}</p>
           </>
         )
