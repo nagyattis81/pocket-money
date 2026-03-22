@@ -98,17 +98,15 @@ const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
   }
 }
 
-export function detectLanguage(): AppLanguage {
+export const detectLanguage = (): AppLanguage => {
   const uiLanguage = chrome.i18n?.getUILanguage?.() ?? navigator.language ?? "en"
 
   return uiLanguage.toLowerCase().startsWith("hu") ? "hu" : "en"
 }
 
-export function normalizeLanguage(value: unknown): AppLanguage {
-  return value === "hu" ? "hu" : "en"
-}
+export const normalizeLanguage = (value: unknown): AppLanguage => value === "hu" ? "hu" : "en"
 
-export async function getStoredLanguage(): Promise<AppLanguage | null> {
+export const getStoredLanguage = async (): Promise<AppLanguage | null> => {
   const stored = await chrome.storage.local.get(LANGUAGE_STORAGE_KEY)
   const storedValue = stored[LANGUAGE_STORAGE_KEY]
 
@@ -119,12 +117,10 @@ export async function getStoredLanguage(): Promise<AppLanguage | null> {
   return normalizeLanguage(storedValue)
 }
 
-export async function saveLanguage(language: AppLanguage) {
+export const saveLanguage = async (language: AppLanguage): Promise<void> => {
   await chrome.storage.local.set({
     [LANGUAGE_STORAGE_KEY]: normalizeLanguage(language)
   })
 }
 
-export function t(language: AppLanguage, key: TranslationKey) {
-  return translations[language][key]
-}
+export const t = (language: AppLanguage, key: TranslationKey): string => translations[language][key]

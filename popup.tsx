@@ -55,11 +55,11 @@ import {
 import { CompactViewIcon, DetailedViewIcon, EnFlagIcon, HuFlagIcon } from "./icons"
 import { detectLanguage, getStoredLanguage, saveLanguage, t } from "./i18n"
 import type { AppLanguage } from "./i18n"
-import type { CurrencyCode, GradeToAmountMap, PopupState, SettingsStatus, TableViewMode } from "./types"
+import type { CurrencyCode, GradeEntry, GradeToAmountMap, MonthSummary, PopupState, SettingsStatus, TableViewMode } from "./types"
 
 const FALLBACK_CURRENCIES: CurrencyCode[] = ["HUF", "EUR", "USD"]
 
-function getCurrencyOptions(language: AppLanguage): Array<{ code: CurrencyCode; label: string }> {
+const getCurrencyOptions = (language: AppLanguage): Array<{ code: CurrencyCode; label: string }> => {
   const locale = language === "hu" ? "hu-HU" : "en-US"
   const intlWithSupported = Intl as Intl.DateTimeFormatOptions & {
     supportedValuesOf?: (key: "currency") => string[]
@@ -71,7 +71,7 @@ function getCurrencyOptions(language: AppLanguage): Array<{ code: CurrencyCode; 
       : null
   const codes = Array.from(new Set([...FALLBACK_CURRENCIES, ...listed])).slice(0, 200)
 
-  return codes.map((code) => {
+  return codes.map((code: CurrencyCode) => {
     const name = displayNames?.of(code) ?? code
     const suffix = code === "HUF" ? "Ft" : code
 
@@ -82,7 +82,7 @@ function getCurrencyOptions(language: AppLanguage): Array<{ code: CurrencyCode; 
   })
 }
 
-function IndexPopup() {
+const IndexPopup = (): React.JSX.Element => {
   const [popupState, setPopupState] = useState<PopupState>({ status: "loading" })
   const [gradeToAmount, setGradeToAmount] = useState<GradeToAmountMap>({ ...DEFAULT_GRADE_TO_AMOUNT })
   const [tableViewMode, setTableViewMode] = useState<TableViewMode>("compact")
@@ -188,10 +188,10 @@ function IndexPopup() {
 
           const extractionResult = await extractMonthlyEntries(activeTab.id, gradeToAmount)
           const monthSummaries = buildMonthSummaries(extractionResult)
-          const grandTotal = monthSummaries.reduce((sum, month) => sum + month.total, 0)
+          const grandTotal = monthSummaries.reduce((sum: number, month: MonthSummary) => sum + month.total, 0)
           const allFiveTotal = calculateAllFiveTotalWithMap(monthSummaries, gradeToAmount)
 
-          if (monthSummaries.every((month) => month.entries.length === 0)) {
+          if (monthSummaries.every((month: MonthSummary) => month.entries.length === 0)) {
             setPopupState({
               status: "empty",
               url: activeUrl,
@@ -232,7 +232,7 @@ function IndexPopup() {
     const parsed = Number(rawValue)
 
     setSettingsStatus("idle")
-    setGradeToAmount((prev) => ({
+    setGradeToAmount((prev: GradeToAmountMap) => ({
       ...prev,
       [grade]: Number.isFinite(parsed) ? Math.round(parsed) : 0
     }))
@@ -297,13 +297,13 @@ function IndexPopup() {
       <h2 style={headingStyle}>{t(language, "settingsTitle")}</h2>
       <p style={textStyle}>{t(language, "settingsHint")}</p>
       <div style={settingsGridStyle}>
-        {[1, 2, 3, 4, 5].map((grade) => (
+        {[1, 2, 3, 4, 5].map((grade: number) => (
           <label key={grade} style={settingsFieldStyle}>
             <span style={settingsFieldLabelStyle}>{grade}</span>
             <input
               type="number"
               value={gradeToAmount[grade] ?? 0}
-              onChange={(event) => handleGradeValueChange(grade, event.target.value)}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => handleGradeValueChange(grade, event.target.value)}
               style={settingsInputStyle}
             />
             <span style={settingsUnitStyle}>{currency === "HUF" ? "Ft" : currency}</span>
@@ -313,7 +313,7 @@ function IndexPopup() {
       <div style={settingsCurrencyGroupStyle}>
         <span style={settingsCurrencyPrefixStyle}>{t(language, "currencyLabel")}</span>
         <select value={currency} onChange={handleCurrencyChange} style={settingsCurrencySelectStyle}>
-          {getCurrencyOptions(language).map((item) => (
+          {getCurrencyOptions(language).map((item: { code: CurrencyCode; label: string }) => (
             <option key={item.code} value={item.code}>
               {item.label}
             </option>
@@ -383,14 +383,14 @@ function IndexPopup() {
                 </tr>
               </thead>
               <tbody>
-                {popupState.monthSummaries.filter((summary) => summary.entries.length > 0).map((summary) => (
+                {popupState.monthSummaries.filter((summary: MonthSummary) => summary.entries.length > 0).map((summary: MonthSummary) => (
                   <tr key={summary.month}>
                     <td style={bodyCellStyle}>{summary.month}</td>
                     {tableViewMode === "detailed" ? (
                       <td style={bodyCellStyle}>
                         {summary.entries.length > 0 ? (
                           <div style={itemListStyle}>
-                            {summary.entries.map((entry, index) => (
+                            {summary.entries.map((entry: GradeEntry, index: number) => (
                               <span
                                 key={`${summary.month}-${entry.subject}-${entry.date}-${index}`}
                                 style={badgeStyle}>
