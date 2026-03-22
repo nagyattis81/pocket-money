@@ -37,6 +37,7 @@ type PopupState =
       url: string
       monthSummaries: MonthSummary[]
       grandTotal: number
+      allFiveTotal: number
     }
   | { status: "empty"; url: string; message: string }
   | { status: "unsupported"; url?: string }
@@ -85,6 +86,12 @@ const summaryStyle: React.CSSProperties = {
   border: "1px solid #d6c7a1",
   fontSize: 15,
   fontWeight: 700
+}
+
+const secondarySummaryStyle: React.CSSProperties = {
+  ...summaryStyle,
+  marginTop: 8,
+  background: "#f7f2e2"
 }
 
 const tableStyle: React.CSSProperties = {
@@ -142,6 +149,17 @@ function buildMonthSummaries(result: PageExtractionResult) {
       total
     }
   })
+}
+
+function calculateAllFiveTotal(monthSummaries: MonthSummary[]) {
+  const allFiveBase = GRADE_TO_AMOUNT[5]
+
+  return monthSummaries.reduce(
+    (sum, month) =>
+      sum +
+      month.entries.reduce((monthSum, entry) => monthSum + Math.round((allFiveBase * entry.weight) / 100), 0),
+    0
+  )
 }
 
 async function extractMonthlyEntries(tabId: number): Promise<PageExtractionResult> {
@@ -284,6 +302,7 @@ function IndexPopup() {
           const extractionResult = await extractMonthlyEntries(activeTab.id)
           const monthSummaries = buildMonthSummaries(extractionResult)
           const grandTotal = monthSummaries.reduce((sum, month) => sum + month.total, 0)
+          const allFiveTotal = calculateAllFiveTotal(monthSummaries)
 
           if (monthSummaries.every((month) => month.entries.length === 0)) {
             setPopupState({
@@ -298,7 +317,8 @@ function IndexPopup() {
             status: "ready",
             url: activeUrl,
             monthSummaries,
-            grandTotal
+            grandTotal,
+            allFiveTotal
           })
           return
         }
@@ -339,6 +359,9 @@ function IndexPopup() {
             </p>
             <p style={hintStyle}>{popupState.url}</p>
             <div style={summaryStyle}>Vegosszeg: {formatAmount(popupState.grandTotal)}</div>
+            <div style={secondarySummaryStyle}>
+              Osszeg, ha minden jegy 5-os lenne: {formatAmount(popupState.allFiveTotal)}
+            </div>
             <table style={tableStyle}>
               <thead>
                 <tr>
