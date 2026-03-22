@@ -1,6 +1,6 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
-  "entry": ["popup.tsx", "icons.tsx"],
+  "entry": ["popup.tsx", "src/icons.tsx"],
   "project": ["**/*.{ts,tsx}"],
   "ignoreDependencies": ["react-dom", "@types/chrome", "@types/react-dom"],
   "ignoreExportsUsedInFile": true
