@@ -35,7 +35,7 @@ export type TranslationKey =
 
 const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
   hu: {
-    loadingTitle: "e-kreta pocket money",
+    loadingTitle: "Pocket Money",
     loadingMessage: "Az aktív lap ellenőrzése folyamatban van.",
     summaryTitle: "Havi zsebpénz összesítő",
     grandTotal: "Végösszeg",
@@ -66,7 +66,7 @@ const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
     tableViewDetailed: "Részletes"
   },
   en: {
-    loadingTitle: "e-kreta pocket money",
+    loadingTitle: "Pocket Money",
     loadingMessage: "Checking the active tab.",
     summaryTitle: "Monthly pocket money summary",
     grandTotal: "Grand total",
