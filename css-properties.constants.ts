@@ -161,3 +161,23 @@ export const amountNeutralStyle: CSSProperties = {
   color: "#6b7280",
   fontWeight: 700
 }
+
+export const flagButtonActiveStyle: CSSProperties = {
+  background: "#efe0bb",
+  border: "2px solid #bfa775",
+  borderRadius: 6,
+  padding: "3px 5px",
+  cursor: "pointer",
+  lineHeight: 0,
+  opacity: 1
+}
+
+export const flagButtonInactiveStyle: CSSProperties = {
+  background: "none",
+  border: "2px solid transparent",
+  borderRadius: 6,
+  padding: "3px 5px",
+  cursor: "pointer",
+  lineHeight: 0,
+  opacity: 0.35
+}

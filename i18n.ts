@@ -29,6 +29,9 @@ export type TranslationKey =
   | "languageTitle"
   | "languageHungarian"
   | "languageEnglish"
+  | "tableViewTitle"
+  | "tableViewCompact"
+  | "tableViewDetailed"
 
 const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
   hu: {
@@ -57,7 +60,10 @@ const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
     settingsSaveFailed: "A mentés nem sikerült.",
     languageTitle: "Nyelv",
     languageHungarian: "Magyar",
-    languageEnglish: "Angol"
+    languageEnglish: "Angol",
+    tableViewTitle: "Táblázat nézet",
+    tableViewCompact: "Tömör",
+    tableViewDetailed: "Részletes"
   },
   en: {
     loadingTitle: "e-kreta pocket money",
@@ -85,7 +91,10 @@ const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
     settingsSaveFailed: "Saving failed.",
     languageTitle: "Language",
     languageHungarian: "Hungarian",
-    languageEnglish: "English"
+    languageEnglish: "English",
+    tableViewTitle: "Table view",
+    tableViewCompact: "Compact",
+    tableViewDetailed: "Detailed"
   }
 }
 

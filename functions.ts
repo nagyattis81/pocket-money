@@ -1,5 +1,26 @@
-import { DEFAULT_GRADE_TO_AMOUNT, GRADE_STORAGE_KEY, SUPPORTED_PATH } from "./constants"
-import type { GradeToAmountMap, MonthSummary, PageExtractionResult } from "./types"
+import {
+  DEFAULT_GRADE_TO_AMOUNT,
+  GRADE_STORAGE_KEY,
+  SUPPORTED_PATH,
+  TABLE_VIEW_MODE_STORAGE_KEY
+} from "./constants"
+import type { GradeToAmountMap, MonthSummary, PageExtractionResult, TableViewMode } from "./types"
+
+export function normalizeTableViewMode(value: unknown): TableViewMode {
+  return value === "detailed" ? "detailed" : "compact"
+}
+
+export async function getStoredTableViewMode(): Promise<TableViewMode> {
+  const stored = await chrome.storage.local.get(TABLE_VIEW_MODE_STORAGE_KEY)
+
+  return normalizeTableViewMode(stored[TABLE_VIEW_MODE_STORAGE_KEY])
+}
+
+export async function saveTableViewMode(mode: TableViewMode) {
+  await chrome.storage.local.set({
+    [TABLE_VIEW_MODE_STORAGE_KEY]: normalizeTableViewMode(mode)
+  })
+}
 
 export function normalizePath(pathname: string) {
   return pathname.replace(/\/+$/, "") || "/"

@@ -1,5 +1,7 @@
 export type GradeToAmountMap = Record<number, number>
 
+export type TableViewMode = "compact" | "detailed"
+
 export type GradeEntry = {
   subject: string
   month: string

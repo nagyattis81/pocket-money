@@ -11,6 +11,8 @@ import {
   bodyCellStyle,
   cardStyle,
   containerStyle,
+  flagButtonActiveStyle,
+  flagButtonInactiveStyle,
   headerCellStyle,
   headingStyle,
   hintStyle,
@@ -33,18 +35,21 @@ import {
   extractMonthlyEntries,
   formatAmount,
   getStoredGradeToAmount,
+  getStoredTableViewMode,
   isSupportedUrl,
   normalizeGradeToAmountMap,
   resetGradeToAmount,
-  saveGradeToAmount
+  saveGradeToAmount,
+  saveTableViewMode
 } from "./functions"
 import { detectLanguage, getStoredLanguage, saveLanguage, t } from "./i18n"
 import type { AppLanguage } from "./i18n"
-import type { GradeToAmountMap, PopupState, SettingsStatus } from "./types"
+import type { GradeToAmountMap, PopupState, SettingsStatus, TableViewMode } from "./types"
 
 function IndexPopup() {
   const [popupState, setPopupState] = useState<PopupState>({ status: "loading" })
   const [gradeToAmount, setGradeToAmount] = useState<GradeToAmountMap>({ ...DEFAULT_GRADE_TO_AMOUNT })
+  const [tableViewMode, setTableViewMode] = useState<TableViewMode>("compact")
   const [settingsStatus, setSettingsStatus] = useState<SettingsStatus>("idle")
   const [language, setLanguage] = useState<AppLanguage>(detectLanguage())
 
@@ -81,8 +86,23 @@ function IndexPopup() {
       }
     }
 
+    const loadStoredTableViewMode = async () => {
+      try {
+        const storedMode = await getStoredTableViewMode()
+
+        if (!disposed) {
+          setTableViewMode(storedMode)
+        }
+      } catch {
+        if (!disposed) {
+          setTableViewMode("compact")
+        }
+      }
+    }
+
     loadStoredLanguage()
     loadStoredSettings()
+    loadStoredTableViewMode()
 
     return () => {
       disposed = true
@@ -187,15 +207,25 @@ function IndexPopup() {
     }
   }
 
-  const handleLanguageChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedLanguage = event.target.value === "hu" ? "hu" : "en"
-
-    setLanguage(selectedLanguage)
+  const handleLanguageChange = async (lang: AppLanguage) => {
+    setLanguage(lang)
 
     try {
-      await saveLanguage(selectedLanguage)
+      await saveLanguage(lang)
     } catch {
       // Keep UI responsive even if saving language fails.
+    }
+  }
+
+  const handleTableViewModeChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedMode: TableViewMode = event.target.value === "detailed" ? "detailed" : "compact"
+
+    setTableViewMode(selectedMode)
+
+    try {
+      await saveTableViewMode(selectedMode)
+    } catch {
+      // Keep UI responsive even if saving table mode fails.
     }
   }
 
@@ -203,10 +233,30 @@ function IndexPopup() {
     <section style={settingsPanelStyle}>
       <div style={languageRowStyle}>
         <span>{t(language, "languageTitle")}:</span>
-        <select value={language} onChange={handleLanguageChange} style={languageSelectStyle}>
-          <option value="hu">{t(language, "languageHungarian")}</option>
-          <option value="en">{t(language, "languageEnglish")}</option>
-        </select>
+        <button
+          type="button"
+          title={t(language, "languageHungarian")}
+          onClick={() => handleLanguageChange("hu")}
+          style={language === "hu" ? flagButtonActiveStyle : flagButtonInactiveStyle}>
+          <svg width="28" height="18" viewBox="0 0 3 2" style={{ display: "block", borderRadius: 2 }}>
+            <rect width="3" height="0.667" fill="#CE2939" />
+            <rect width="3" height="0.667" y="0.667" fill="#FFFFFF" />
+            <rect width="3" height="0.667" y="1.333" fill="#477050" />
+          </svg>
+        </button>
+        <button
+          type="button"
+          title={t(language, "languageEnglish")}
+          onClick={() => handleLanguageChange("en")}
+          style={language === "en" ? flagButtonActiveStyle : flagButtonInactiveStyle}>
+          <svg width="28" height="18" viewBox="0 0 60 40" style={{ display: "block", borderRadius: 2 }}>
+            <rect width="60" height="40" fill="#012169" />
+            <path d="M0,0 L60,40 M60,0 L0,40" stroke="#fff" strokeWidth="8" />
+            <path d="M0,0 L60,40 M60,0 L0,40" stroke="#C8102E" strokeWidth="4" />
+            <path d="M30,0 V40 M0,20 H60" stroke="#fff" strokeWidth="12" />
+            <path d="M30,0 V40 M0,20 H60" stroke="#C8102E" strokeWidth="8" />
+          </svg>
+        </button>
       </div>
       <h2 style={headingStyle}>{t(language, "settingsTitle")}</h2>
       <p style={textStyle}>{t(language, "settingsHint")}</p>
@@ -256,11 +306,20 @@ function IndexPopup() {
               {t(language, "grandTotal")}: <strong>{formatAmount(popupState.grandTotal)}</strong> | {t(language, "allFiveTotal")}:{" "}
               <strong>{formatAmount(popupState.allFiveTotal)}</strong>
             </div>
+            <div style={languageRowStyle}>
+              <span>{t(language, "tableViewTitle")}:</span>
+              <select value={tableViewMode} onChange={handleTableViewModeChange} style={languageSelectStyle}>
+                <option value="compact">{t(language, "tableViewCompact")}</option>
+                <option value="detailed">{t(language, "tableViewDetailed")}</option>
+              </select>
+            </div>
             <table style={tableStyle}>
               <thead>
                 <tr>
                   <th style={headerCellStyle}>{t(language, "month")}</th>
-                  <th style={headerCellStyle}>{t(language, "gradesAndWeights")}</th>
+                  {tableViewMode === "detailed" ? (
+                    <th style={headerCellStyle}>{t(language, "gradesAndWeights")}</th>
+                  ) : null}
                   <th style={headerCellStyle}>{t(language, "total")}</th>
                 </tr>
               </thead>
@@ -268,32 +327,34 @@ function IndexPopup() {
                 {popupState.monthSummaries.map((summary) => (
                   <tr key={summary.month}>
                     <td style={bodyCellStyle}>{summary.month}</td>
-                    <td style={bodyCellStyle}>
-                      {summary.entries.length > 0 ? (
-                        <div style={itemListStyle}>
-                          {summary.entries.map((entry, index) => (
-                            <span
-                              key={`${summary.month}-${entry.subject}-${entry.date}-${index}`}
-                              style={badgeStyle}>
-                              {entry.subject}: {entry.grade} ({entry.weight}%)
-                              {" "}
+                    {tableViewMode === "detailed" ? (
+                      <td style={bodyCellStyle}>
+                        {summary.entries.length > 0 ? (
+                          <div style={itemListStyle}>
+                            {summary.entries.map((entry, index) => (
                               <span
-                                style={
-                                  entry.amount > 0
-                                    ? amountPositiveStyle
-                                    : entry.amount < 0
-                                      ? amountNegativeStyle
-                                      : amountNeutralStyle
-                                }>
-                                {formatAmount(entry.amount)}
+                                key={`${summary.month}-${entry.subject}-${entry.date}-${index}`}
+                                style={badgeStyle}>
+                                {entry.subject}: {entry.grade} ({entry.weight}%)
+                                {" "}
+                                <span
+                                  style={
+                                    entry.amount > 0
+                                      ? amountPositiveStyle
+                                      : entry.amount < 0
+                                        ? amountNegativeStyle
+                                        : amountNeutralStyle
+                                  }>
+                                  {formatAmount(entry.amount)}
+                                </span>
                               </span>
-                            </span>
-                          ))}
-                        </div>
-                      ) : (
-                        <span style={hintStyle}>{t(language, "noGrades")}</span>
-                      )}
-                    </td>
+                            ))}
+                          </div>
+                        ) : (
+                          <span style={hintStyle}>{t(language, "noGrades")}</span>
+                        )}
+                      </td>
+                    ) : null}
                     <td style={bodyCellStyle}>{formatAmount(summary.total)}</td>
                   </tr>
                 ))}
