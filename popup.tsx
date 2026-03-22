@@ -23,6 +23,8 @@ import {
   settingsInputStyle,
   settingsPanelStyle,
   settingsStatusStyle,
+  summaryAmountsStyle,
+  summaryControlsStyle,
   summaryStyle,
   tableStyle,
   textStyle
@@ -275,27 +277,27 @@ function IndexPopup() {
           <>
             <h1 style={headingStyle}>{t(language, "summaryTitle")}</h1>
             <div style={summaryStyle}>
-              {t(language, "grandTotal")}: <strong>{formatAmount(popupState.grandTotal)}</strong> | {t(language, "allFiveTotal")}:{" "}
-              <strong>{formatAmount(popupState.allFiveTotal)}</strong>
+              <div style={summaryAmountsStyle}>
+                {t(language, "grandTotal")}: <strong>{formatAmount(popupState.grandTotal)}</strong> | {t(language, "allFiveTotal")}:{" "}
+                <strong>{formatAmount(popupState.allFiveTotal)}</strong>
+              </div>
+              <div style={summaryControlsStyle}>
+                <button
+                  type="button"
+                  title={tableViewMode === "compact" ? t(language, "tableViewCompact") : t(language, "tableViewDetailed")}
+                  onClick={handleTableViewModeChange}
+                  style={flagButtonActiveStyle}>
+                  {tableViewMode === "compact" ? <CompactViewIcon /> : <DetailedViewIcon />}
+                </button>
+                <button
+                  type="button"
+                  title={language === "hu" ? t(language, "languageHungarian") : t(language, "languageEnglish")}
+                  onClick={handleLanguageChange}
+                  style={flagButtonActiveStyle}>
+                  {language === "hu" ? <HuFlagIcon /> : <EnFlagIcon />}
+                </button>
+              </div>
             </div>
-            <div style={languageRowStyle}>
-              <button
-                type="button"
-                title={tableViewMode === "compact" ? t(language, "tableViewCompact") : t(language, "tableViewDetailed")}
-                onClick={handleTableViewModeChange}
-                style={flagButtonActiveStyle}>
-                {tableViewMode === "compact" ? <CompactViewIcon /> : <DetailedViewIcon />}
-              </button>
-            </div>
-            <div style={languageRowStyle}>
-              <button
-                type="button"
-                title={language === "hu" ? t(language, "languageHungarian") : t(language, "languageEnglish")}
-                onClick={handleLanguageChange}
-                style={flagButtonActiveStyle}>
-                {language === "hu" ? <HuFlagIcon /> : <EnFlagIcon />}
-              </button>
-            </div>            
             <table style={tableStyle}>
               <thead>
                 <tr>
