@@ -62,12 +62,6 @@ export const summaryControlsStyle: CSSProperties = {
   marginLeft: "auto"
 }
 
-export const secondarySummaryStyle: CSSProperties = {
-  ...summaryStyle,
-  marginTop: 8,
-  background: "#f7f2e2"
-}
-
 export const tableStyle: CSSProperties = {
   width: "100%",
   marginTop: 16,
@@ -220,14 +214,6 @@ export const settingsStatusStyle: CSSProperties = {
   color: "#6b7280"
 }
 
-export const languageSelectStyle: CSSProperties = {
-  borderRadius: 8,
-  border: "1px solid #d8c8a0",
-  background: "#fffaf0",
-  color: "#1f2937",
-  padding: "6px 8px"
-}
-
 export const amountPositiveStyle: CSSProperties = {
   color: "#2f7a43",
   fontWeight: 700
@@ -251,14 +237,4 @@ export const flagButtonActiveStyle: CSSProperties = {
   cursor: "pointer",
   lineHeight: 0,
   opacity: 1
-}
-
-export const flagButtonInactiveStyle: CSSProperties = {
-  background: "none",
-  border: "2px solid transparent",
-  borderRadius: 6,
-  padding: "3px 5px",
-  cursor: "pointer",
-  lineHeight: 0,
-  opacity: 0.35
 }

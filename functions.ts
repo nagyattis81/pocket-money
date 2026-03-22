@@ -69,17 +69,6 @@ export const buildMonthSummaries = (result: PageExtractionResult): MonthSummary[
     }
   })
 
-export const calculateAllFiveTotal = (monthSummaries: MonthSummary[]): number => {
-  const allFiveBase = DEFAULT_GRADE_TO_AMOUNT[5]
-
-  return monthSummaries.reduce(
-    (sum: number, month: MonthSummary) =>
-      sum +
-      month.entries.reduce((monthSum: number, entry: GradeEntry) => monthSum + Math.round((allFiveBase * entry.weight) / 100), 0),
-    0
-  )
-}
-
 export const normalizeGradeToAmountMap = (input: unknown): GradeToAmountMap => {
   const fallback = DEFAULT_GRADE_TO_AMOUNT
   const source = typeof input === "object" && input !== null ? (input as Record<string, unknown>) : {}
