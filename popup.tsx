@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react"
 import {
+  DEFAULT_CURRENCY,
   DEFAULT_GRADE_TO_AMOUNT,
   SUPPORTED_PATH
 } from "./constants"
@@ -18,6 +19,9 @@ import {
   itemListStyle,
   settingsActionsStyle,
   settingsButtonStyle,
+  settingsCurrencyGroupStyle,
+  settingsCurrencyPrefixStyle,
+  settingsCurrencySelectStyle,
   settingsFieldLabelStyle,
   settingsFieldStyle,
   settingsGridStyle,
@@ -37,18 +41,45 @@ import {
   calculateAllFiveTotalWithMap,
   extractMonthlyEntries,
   formatAmount,
+  getStoredCurrency,
   getStoredGradeToAmount,
   getStoredTableViewMode,
   isSupportedUrl,
   normalizeGradeToAmountMap,
   resetGradeToAmount,
+  saveCurrency,
   saveGradeToAmount,
   saveTableViewMode
 } from "./functions"
 import { CompactViewIcon, DetailedViewIcon, EnFlagIcon, HuFlagIcon } from "./icons"
 import { detectLanguage, getStoredLanguage, saveLanguage, t } from "./i18n"
 import type { AppLanguage } from "./i18n"
-import type { GradeToAmountMap, PopupState, SettingsStatus, TableViewMode } from "./types"
+import type { CurrencyCode, GradeToAmountMap, PopupState, SettingsStatus, TableViewMode } from "./types"
+
+const FALLBACK_CURRENCIES: CurrencyCode[] = ["HUF", "EUR", "USD"]
+
+function getCurrencyOptions(language: AppLanguage): Array<{ code: CurrencyCode; label: string }> {
+  const locale = language === "hu" ? "hu-HU" : "en-US"
+  const intlWithSupported = Intl as Intl.DateTimeFormatOptions & {
+    supportedValuesOf?: (key: "currency") => string[]
+  }
+  const listed = intlWithSupported.supportedValuesOf?.("currency") ?? []
+  const displayNames =
+    "DisplayNames" in Intl
+      ? new Intl.DisplayNames([locale], { type: "currency" })
+      : null
+  const codes = Array.from(new Set([...FALLBACK_CURRENCIES, ...listed])).slice(0, 200)
+
+  return codes.map((code) => {
+    const name = displayNames?.of(code) ?? code
+    const suffix = code === "HUF" ? "Ft" : code
+
+    return {
+      code,
+      label: `${name} (${suffix})`
+    }
+  })
+}
 
 function IndexPopup() {
   const [popupState, setPopupState] = useState<PopupState>({ status: "loading" })
@@ -56,6 +87,7 @@ function IndexPopup() {
   const [tableViewMode, setTableViewMode] = useState<TableViewMode>("compact")
   const [settingsStatus, setSettingsStatus] = useState<SettingsStatus>("idle")
   const [language, setLanguage] = useState<AppLanguage>(detectLanguage())
+  const [currency, setCurrency] = useState<CurrencyCode>(DEFAULT_CURRENCY)
 
   useEffect(() => {
     document.body.style.margin = "0"
@@ -104,9 +136,24 @@ function IndexPopup() {
       }
     }
 
+    const loadStoredCurrency = async () => {
+      try {
+        const storedCurrency = await getStoredCurrency()
+
+        if (!disposed) {
+          setCurrency(storedCurrency)
+        }
+      } catch {
+        if (!disposed) {
+          setCurrency(DEFAULT_CURRENCY)
+        }
+      }
+    }
+
     loadStoredLanguage()
     loadStoredSettings()
     loadStoredTableViewMode()
+    loadStoredCurrency()
 
     return () => {
       disposed = true
@@ -233,6 +280,17 @@ function IndexPopup() {
     }
   }
 
+  const handleCurrencyChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const nextCurrency = event.target.value as CurrencyCode
+    setCurrency(nextCurrency)
+
+    try {
+      await saveCurrency(nextCurrency)
+    } catch {
+      // Keep UI responsive even if saving currency fails.
+    }
+  }
+
   const renderSettingsPanel = () => (
     <section style={settingsPanelStyle}>
       <h2 style={headingStyle}>{t(language, "settingsTitle")}</h2>
@@ -247,9 +305,19 @@ function IndexPopup() {
               onChange={(event) => handleGradeValueChange(grade, event.target.value)}
               style={settingsInputStyle}
             />
-            <span style={settingsUnitStyle}>Ft</span>
+            <span style={settingsUnitStyle}>{currency === "HUF" ? "Ft" : currency}</span>
           </label>
         ))}
+      </div>
+      <div style={settingsCurrencyGroupStyle}>
+        <span style={settingsCurrencyPrefixStyle}>{t(language, "currencyLabel")}</span>
+        <select value={currency} onChange={handleCurrencyChange} style={settingsCurrencySelectStyle}>
+          {getCurrencyOptions(language).map((item) => (
+            <option key={item.code} value={item.code}>
+              {item.label}
+            </option>
+          ))}
+        </select>
       </div>
       <div style={settingsActionsStyle}>
         <button type="button" onClick={handleSaveSettings} style={settingsButtonStyle}>
@@ -282,8 +350,8 @@ function IndexPopup() {
             <h1 style={headingStyle}>{t(language, "summaryTitle")}</h1>
             <div style={summaryStyle}>
               <div style={summaryAmountsStyle}>
-                {t(language, "grandTotal")}: <strong>{formatAmount(popupState.grandTotal)}</strong> | {t(language, "allFiveTotal")}:{" "}
-                <strong>{formatAmount(popupState.allFiveTotal)}</strong>
+                {t(language, "grandTotal")}: <strong>{formatAmount(popupState.grandTotal, currency)}</strong> | {t(language, "allFiveTotal")}:{" "}
+                <strong>{formatAmount(popupState.allFiveTotal, currency)}</strong>
               </div>
               <div style={summaryControlsStyle}>
                 <button
@@ -335,7 +403,7 @@ function IndexPopup() {
                                         ? amountNegativeStyle
                                         : amountNeutralStyle
                                   }>
-                                  {formatAmount(entry.amount)}
+                                  {formatAmount(entry.amount, currency)}
                                 </span>
                               </span>
                             ))}
@@ -345,8 +413,8 @@ function IndexPopup() {
                         )}
                       </td>
                     ) : null}
-                    <td style={{ ...bodyCellStyle, whiteSpace: "nowrap" }}>{formatAmount(summary.total)}</td>
-                    <td style={{ ...bodyCellStyle, whiteSpace: "nowrap" }}>{formatAmount(calculateMonthAllFiveTotalWithMap(summary, gradeToAmount))}</td>
+                    <td style={{ ...bodyCellStyle, whiteSpace: "nowrap" }}>{formatAmount(summary.total, currency)}</td>
+                    <td style={{ ...bodyCellStyle, whiteSpace: "nowrap" }}>{formatAmount(calculateMonthAllFiveTotalWithMap(summary, gradeToAmount), currency)}</td>
                   </tr>
                 ))}
               </tbody>

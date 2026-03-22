@@ -1,5 +1,7 @@
 export type GradeToAmountMap = Record<number, number>
 
+export type CurrencyCode = string
+
 export type TableViewMode = "compact" | "detailed"
 
 export type GradeEntry = {

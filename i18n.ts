@@ -23,6 +23,7 @@ export type TranslationKey =
   | "activeTabCheckFailed"
   | "settingsTitle"
   | "settingsHint"
+  | "currencyLabel"
   | "saveSettings"
   | "resetDefaults"
   | "settingsSaved"
@@ -38,7 +39,7 @@ const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
     loadingMessage: "Az aktív lap ellenőrzése folyamatban van.",
     summaryTitle: "Havi zsebpénz összesítő",
     grandTotal: "Végösszeg",
-    allFiveTotal: "Összeg, ha minden jegy 5-ös lenne",
+    allFiveTotal: "ha minden jegy 5-ös lenne",
     month: "Hónap",
     gradesAndWeights: "Jegyek és súlyok",
     total: "Összesen",
@@ -53,7 +54,8 @@ const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
     missingTabId: "Az aktív lap azonosítója nem érhető el.",
     activeTabCheckFailed: "Az aktív lap nem ellenőrizhető.",
     settingsTitle: "Jegy / Ft beállítások",
-    settingsHint: "Módosítsd az értékeket, majd mentsd el. A rendszer chrome.storage.local-ba ment.",
+    settingsHint: "Módosítsd az értékeket, majd mentsd el.",
+    currencyLabel: "Pénznem",
     saveSettings: "Mentés",
     resetDefaults: "Alapértékek",
     settingsSaved: "Beállítások elmentve.",
@@ -68,7 +70,7 @@ const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
     loadingMessage: "Checking the active tab.",
     summaryTitle: "Monthly pocket money summary",
     grandTotal: "Grand total",
-    allFiveTotal: "Amount if every grade had been 5",
+    allFiveTotal: "if every grade had been 5",
     month: "Month",
     gradesAndWeights: "Grades and weights",
     total: "Total",
@@ -83,7 +85,8 @@ const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
     missingTabId: "The active tab id is not available.",
     activeTabCheckFailed: "The active tab cannot be checked.",
     settingsTitle: "Grade / Ft settings",
-    settingsHint: "Update values and save them. Values are persisted in chrome.storage.local.",
+    settingsHint: "Update values and save them.",
+    currencyLabel: "Currency",
     saveSettings: "Save",
     resetDefaults: "Defaults",
     settingsSaved: "Settings saved.",

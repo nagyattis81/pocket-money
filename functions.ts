@@ -1,10 +1,12 @@
 import {
+  CURRENCY_STORAGE_KEY,
   DEFAULT_GRADE_TO_AMOUNT,
+  DEFAULT_CURRENCY,
   GRADE_STORAGE_KEY,
   SUPPORTED_PATH,
   TABLE_VIEW_MODE_STORAGE_KEY
 } from "./constants"
-import type { GradeToAmountMap, MonthSummary, PageExtractionResult, TableViewMode } from "./types"
+import type { CurrencyCode, GradeToAmountMap, MonthSummary, PageExtractionResult, TableViewMode } from "./types"
 
 export function normalizeTableViewMode(value: unknown): TableViewMode {
   return value === "detailed" ? "detailed" : "compact"
@@ -26,8 +28,38 @@ export function normalizePath(pathname: string) {
   return pathname.replace(/\/+$/, "") || "/"
 }
 
-export function formatAmount(amount: number) {
-  return `${amount > 0 ? "+" : ""}${amount} Ft`
+export function normalizeCurrency(value: unknown): CurrencyCode {
+  if (value === "Ft") {
+    return "HUF"
+  }
+
+  if (typeof value === "string") {
+    const normalized = value.trim().toUpperCase()
+
+    if (/^[A-Z]{3}$/.test(normalized)) {
+      return normalized
+    }
+  }
+
+  return DEFAULT_CURRENCY
+}
+
+export async function getStoredCurrency(): Promise<CurrencyCode> {
+  const stored = await chrome.storage.local.get(CURRENCY_STORAGE_KEY)
+
+  return normalizeCurrency(stored[CURRENCY_STORAGE_KEY])
+}
+
+export async function saveCurrency(currency: CurrencyCode) {
+  await chrome.storage.local.set({
+    [CURRENCY_STORAGE_KEY]: normalizeCurrency(currency)
+  })
+}
+
+export function formatAmount(amount: number, currency: CurrencyCode = DEFAULT_CURRENCY as CurrencyCode) {
+  const currencyLabel = currency === "HUF" ? "Ft" : currency
+
+  return `${amount > 0 ? "+" : ""}${amount} ${currencyLabel}`
 }
 
 export function buildMonthSummaries(result: PageExtractionResult) {

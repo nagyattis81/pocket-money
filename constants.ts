@@ -11,3 +11,7 @@ export const DEFAULT_GRADE_TO_AMOUNT: Record<number, number> = {
 export const GRADE_STORAGE_KEY = "gradeToAmount"
 
 export const TABLE_VIEW_MODE_STORAGE_KEY = "tableViewMode"
+
+export const CURRENCY_STORAGE_KEY = "currency"
+
+export const DEFAULT_CURRENCY = "HUF"

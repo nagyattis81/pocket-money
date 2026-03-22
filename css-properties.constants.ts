@@ -165,6 +165,40 @@ export const settingsUnitStyle: CSSProperties = {
   boxSizing: "border-box"
 }
 
+export const settingsCurrencyGroupStyle: CSSProperties = {
+  display: "flex",
+  alignItems: "stretch",
+  width: "100%",
+  maxWidth: 320,
+  marginTop: 8
+}
+
+export const settingsCurrencyPrefixStyle: CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  padding: "6px 10px",
+  fontSize: 12,
+  fontWeight: 600,
+  color: "black",
+  background: "#efe0bb",
+  border: "1px solid #d8c8a0",
+  borderRight: "none",
+  borderRadius: "8px 0 0 8px",
+  whiteSpace: "nowrap",
+  boxSizing: "border-box"
+}
+
+export const settingsCurrencySelectStyle: CSSProperties = {
+  flex: 1,
+  minWidth: 0,
+  borderRadius: "0 8px 8px 0",
+  border: "1px solid #d8c8a0",
+  background: "#fffaf0",
+  color: "#1f2937",
+  padding: "6px 8px",
+  boxSizing: "border-box"
+}
+
 export const settingsActionsStyle: CSSProperties = {
   display: "flex",
   gap: 8,
