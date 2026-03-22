@@ -26,10 +26,8 @@ export type TranslationKey =
   | "resetDefaults"
   | "settingsSaved"
   | "settingsSaveFailed"
-  | "languageTitle"
   | "languageHungarian"
   | "languageEnglish"
-  | "tableViewTitle"
   | "tableViewCompact"
   | "tableViewDetailed"
 
@@ -58,10 +56,8 @@ const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
     resetDefaults: "Alapértékek",
     settingsSaved: "Beállítások elmentve.",
     settingsSaveFailed: "A mentés nem sikerült.",
-    languageTitle: "Nyelv",
     languageHungarian: "Magyar",
     languageEnglish: "Angol",
-    tableViewTitle: "Táblázat nézet",
     tableViewCompact: "Tömör",
     tableViewDetailed: "Részletes"
   },
@@ -89,10 +85,8 @@ const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
     resetDefaults: "Defaults",
     settingsSaved: "Settings saved.",
     settingsSaveFailed: "Saving failed.",
-    languageTitle: "Language",
     languageHungarian: "Hungarian",
     languageEnglish: "English",
-    tableViewTitle: "Table view",
     tableViewCompact: "Compact",
     tableViewDetailed: "Detailed"
   }

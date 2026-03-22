@@ -12,13 +12,11 @@ import {
   cardStyle,
   containerStyle,
   flagButtonActiveStyle,
-  flagButtonInactiveStyle,
   headerCellStyle,
   headingStyle,
   hintStyle,
   itemListStyle,
   languageRowStyle,
-  languageSelectStyle,
   settingsActionsStyle,
   settingsButtonStyle,
   settingsGridStyle,
@@ -207,23 +205,23 @@ function IndexPopup() {
     }
   }
 
-  const handleLanguageChange = async (lang: AppLanguage) => {
-    setLanguage(lang)
+  const handleLanguageChange = async () => {
+    const next: AppLanguage = language === "hu" ? "en" : "hu"
+    setLanguage(next)
 
     try {
-      await saveLanguage(lang)
+      await saveLanguage(next)
     } catch {
       // Keep UI responsive even if saving language fails.
     }
   }
 
-  const handleTableViewModeChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedMode: TableViewMode = event.target.value === "detailed" ? "detailed" : "compact"
-
-    setTableViewMode(selectedMode)
+  const handleTableViewModeChange = async () => {
+    const next: TableViewMode = tableViewMode === "compact" ? "detailed" : "compact"
+    setTableViewMode(next)
 
     try {
-      await saveTableViewMode(selectedMode)
+      await saveTableViewMode(next)
     } catch {
       // Keep UI responsive even if saving table mode fails.
     }
@@ -232,30 +230,26 @@ function IndexPopup() {
   const renderSettingsPanel = () => (
     <section style={settingsPanelStyle}>
       <div style={languageRowStyle}>
-        <span>{t(language, "languageTitle")}:</span>
         <button
           type="button"
-          title={t(language, "languageHungarian")}
-          onClick={() => handleLanguageChange("hu")}
-          style={language === "hu" ? flagButtonActiveStyle : flagButtonInactiveStyle}>
-          <svg width="28" height="18" viewBox="0 0 3 2" style={{ display: "block", borderRadius: 2 }}>
-            <rect width="3" height="0.667" fill="#CE2939" />
-            <rect width="3" height="0.667" y="0.667" fill="#FFFFFF" />
-            <rect width="3" height="0.667" y="1.333" fill="#477050" />
-          </svg>
-        </button>
-        <button
-          type="button"
-          title={t(language, "languageEnglish")}
-          onClick={() => handleLanguageChange("en")}
-          style={language === "en" ? flagButtonActiveStyle : flagButtonInactiveStyle}>
-          <svg width="28" height="18" viewBox="0 0 60 40" style={{ display: "block", borderRadius: 2 }}>
-            <rect width="60" height="40" fill="#012169" />
-            <path d="M0,0 L60,40 M60,0 L0,40" stroke="#fff" strokeWidth="8" />
-            <path d="M0,0 L60,40 M60,0 L0,40" stroke="#C8102E" strokeWidth="4" />
-            <path d="M30,0 V40 M0,20 H60" stroke="#fff" strokeWidth="12" />
-            <path d="M30,0 V40 M0,20 H60" stroke="#C8102E" strokeWidth="8" />
-          </svg>
+          title={language === "hu" ? t(language, "languageHungarian") : t(language, "languageEnglish")}
+          onClick={handleLanguageChange}
+          style={flagButtonActiveStyle}>
+          {language === "hu" ? (
+            <svg width="28" height="18" viewBox="0 0 3 2" style={{ display: "block", borderRadius: 2 }}>
+              <rect width="3" height="0.667" fill="#CE2939" />
+              <rect width="3" height="0.667" y="0.667" fill="#FFFFFF" />
+              <rect width="3" height="0.667" y="1.333" fill="#477050" />
+            </svg>
+          ) : (
+            <svg width="28" height="18" viewBox="0 0 60 40" style={{ display: "block", borderRadius: 2 }}>
+              <rect width="60" height="40" fill="#012169" />
+              <path d="M0,0 L60,40 M60,0 L0,40" stroke="#fff" strokeWidth="8" />
+              <path d="M0,0 L60,40 M60,0 L0,40" stroke="#C8102E" strokeWidth="4" />
+              <path d="M30,0 V40 M0,20 H60" stroke="#fff" strokeWidth="12" />
+              <path d="M30,0 V40 M0,20 H60" stroke="#C8102E" strokeWidth="8" />
+            </svg>
+          )}
         </button>
       </div>
       <h2 style={headingStyle}>{t(language, "settingsTitle")}</h2>
@@ -307,11 +301,27 @@ function IndexPopup() {
               <strong>{formatAmount(popupState.allFiveTotal)}</strong>
             </div>
             <div style={languageRowStyle}>
-              <span>{t(language, "tableViewTitle")}:</span>
-              <select value={tableViewMode} onChange={handleTableViewModeChange} style={languageSelectStyle}>
-                <option value="compact">{t(language, "tableViewCompact")}</option>
-                <option value="detailed">{t(language, "tableViewDetailed")}</option>
-              </select>
+              <button
+                type="button"
+                title={tableViewMode === "compact" ? t(language, "tableViewCompact") : t(language, "tableViewDetailed")}
+                onClick={handleTableViewModeChange}
+                style={flagButtonActiveStyle}>
+                {tableViewMode === "compact" ? (
+                  <svg width="22" height="18" viewBox="0 0 22 18" style={{ display: "block" }}>
+                    <rect x="1" y="2" width="20" height="3" rx="1" fill="currentColor" />
+                    <rect x="1" y="7.5" width="20" height="3" rx="1" fill="currentColor" />
+                    <rect x="1" y="13" width="20" height="3" rx="1" fill="currentColor" />
+                  </svg>
+                ) : (
+                  <svg width="22" height="18" viewBox="0 0 22 18" style={{ display: "block" }}>
+                    <rect x="1" y="1" width="20" height="4" rx="1" fill="currentColor" />
+                    <rect x="1" y="7" width="9" height="4" rx="1" fill="currentColor" />
+                    <rect x="12" y="7" width="9" height="4" rx="1" fill="currentColor" />
+                    <rect x="1" y="13" width="9" height="4" rx="1" fill="currentColor" />
+                    <rect x="12" y="13" width="9" height="4" rx="1" fill="currentColor" />
+                  </svg>
+                )}
+              </button>
             </div>
             <table style={tableStyle}>
               <thead>
