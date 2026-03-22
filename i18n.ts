@@ -1,5 +1,7 @@
 export type AppLanguage = "hu" | "en"
 
+const LANGUAGE_STORAGE_KEY = "appLanguage"
+
 export type TranslationKey =
   | "loadingTitle"
   | "loadingMessage"
@@ -24,6 +26,9 @@ export type TranslationKey =
   | "resetDefaults"
   | "settingsSaved"
   | "settingsSaveFailed"
+  | "languageTitle"
+  | "languageHungarian"
+  | "languageEnglish"
 
 const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
   hu: {
@@ -49,7 +54,10 @@ const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
     saveSettings: "Mentés",
     resetDefaults: "Alapértékek",
     settingsSaved: "Beállítások elmentve.",
-    settingsSaveFailed: "A mentés nem sikerült."
+    settingsSaveFailed: "A mentés nem sikerült.",
+    languageTitle: "Nyelv",
+    languageHungarian: "Magyar",
+    languageEnglish: "Angol"
   },
   en: {
     loadingTitle: "e-kreta pocket money",
@@ -74,7 +82,10 @@ const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
     saveSettings: "Save",
     resetDefaults: "Defaults",
     settingsSaved: "Settings saved.",
-    settingsSaveFailed: "Saving failed."
+    settingsSaveFailed: "Saving failed.",
+    languageTitle: "Language",
+    languageHungarian: "Hungarian",
+    languageEnglish: "English"
   }
 }
 
@@ -82,6 +93,27 @@ export function detectLanguage(): AppLanguage {
   const uiLanguage = chrome.i18n?.getUILanguage?.() ?? navigator.language ?? "en"
 
   return uiLanguage.toLowerCase().startsWith("hu") ? "hu" : "en"
+}
+
+export function normalizeLanguage(value: unknown): AppLanguage {
+  return value === "hu" ? "hu" : "en"
+}
+
+export async function getStoredLanguage(): Promise<AppLanguage | null> {
+  const stored = await chrome.storage.local.get(LANGUAGE_STORAGE_KEY)
+  const storedValue = stored[LANGUAGE_STORAGE_KEY]
+
+  if (storedValue === undefined) {
+    return null
+  }
+
+  return normalizeLanguage(storedValue)
+}
+
+export async function saveLanguage(language: AppLanguage) {
+  await chrome.storage.local.set({
+    [LANGUAGE_STORAGE_KEY]: normalizeLanguage(language)
+  })
 }
 
 export function t(language: AppLanguage, key: TranslationKey) {

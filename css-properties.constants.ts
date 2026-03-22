@@ -132,6 +132,21 @@ export const settingsStatusStyle: CSSProperties = {
   color: "#6b7280"
 }
 
+export const languageRowStyle: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 8,
+  marginTop: 8
+}
+
+export const languageSelectStyle: CSSProperties = {
+  borderRadius: 8,
+  border: "1px solid #d8c8a0",
+  background: "#fffaf0",
+  color: "#1f2937",
+  padding: "6px 8px"
+}
+
 export const amountPositiveStyle: CSSProperties = {
   color: "#2f7a43",
   fontWeight: 700

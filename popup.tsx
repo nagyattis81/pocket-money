@@ -15,6 +15,8 @@ import {
   headingStyle,
   hintStyle,
   itemListStyle,
+  languageRowStyle,
+  languageSelectStyle,
   settingsActionsStyle,
   settingsButtonStyle,
   settingsGridStyle,
@@ -36,14 +38,15 @@ import {
   resetGradeToAmount,
   saveGradeToAmount
 } from "./functions"
-import { detectLanguage, t } from "./i18n"
+import { detectLanguage, getStoredLanguage, saveLanguage, t } from "./i18n"
+import type { AppLanguage } from "./i18n"
 import type { GradeToAmountMap, PopupState, SettingsStatus } from "./types"
 
 function IndexPopup() {
   const [popupState, setPopupState] = useState<PopupState>({ status: "loading" })
   const [gradeToAmount, setGradeToAmount] = useState<GradeToAmountMap>({ ...DEFAULT_GRADE_TO_AMOUNT })
   const [settingsStatus, setSettingsStatus] = useState<SettingsStatus>("idle")
-  const language = detectLanguage()
+  const [language, setLanguage] = useState<AppLanguage>(detectLanguage())
 
   useEffect(() => {
     document.body.style.margin = "0"
@@ -51,6 +54,18 @@ function IndexPopup() {
 
   useEffect(() => {
     let disposed = false
+
+    const loadStoredLanguage = async () => {
+      try {
+        const storedLanguage = await getStoredLanguage()
+
+        if (!disposed && storedLanguage) {
+          setLanguage(storedLanguage)
+        }
+      } catch {
+        // Fallback stays on detected language.
+      }
+    }
 
     const loadStoredSettings = async () => {
       try {
@@ -66,6 +81,7 @@ function IndexPopup() {
       }
     }
 
+    loadStoredLanguage()
     loadStoredSettings()
 
     return () => {
@@ -171,8 +187,27 @@ function IndexPopup() {
     }
   }
 
+  const handleLanguageChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedLanguage = event.target.value === "hu" ? "hu" : "en"
+
+    setLanguage(selectedLanguage)
+
+    try {
+      await saveLanguage(selectedLanguage)
+    } catch {
+      // Keep UI responsive even if saving language fails.
+    }
+  }
+
   const renderSettingsPanel = () => (
     <section style={settingsPanelStyle}>
+      <div style={languageRowStyle}>
+        <span>{t(language, "languageTitle")}:</span>
+        <select value={language} onChange={handleLanguageChange} style={languageSelectStyle}>
+          <option value="hu">{t(language, "languageHungarian")}</option>
+          <option value="en">{t(language, "languageEnglish")}</option>
+        </select>
+      </div>
       <h2 style={headingStyle}>{t(language, "settingsTitle")}</h2>
       <p style={textStyle}>{t(language, "settingsHint")}</p>
       <div style={settingsGridStyle}>
