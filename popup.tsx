@@ -3,6 +3,9 @@ import {
   SUPPORTED_PATH
 } from "./constants"
 import {
+  amountNegativeStyle,
+  amountNeutralStyle,
+  amountPositiveStyle,
   badgeStyle,
   bodyCellStyle,
   cardStyle,
@@ -136,7 +139,18 @@ function IndexPopup() {
                             <span
                               key={`${summary.month}-${entry.subject}-${entry.date}-${index}`}
                               style={badgeStyle}>
-                              {entry.subject}: {entry.grade} ({entry.weight}%) {formatAmount(entry.amount)}
+                              {entry.subject}: {entry.grade} ({entry.weight}%)
+                              {" "}
+                              <span
+                                style={
+                                  entry.amount > 0
+                                    ? amountPositiveStyle
+                                    : entry.amount < 0
+                                      ? amountNegativeStyle
+                                      : amountNeutralStyle
+                                }>
+                                {formatAmount(entry.amount)}
+                              </span>
                             </span>
                           ))}
                         </div>

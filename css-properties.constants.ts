@@ -86,3 +86,18 @@ export const badgeStyle: CSSProperties = {
   border: "1px solid #e4d4a6",
   lineHeight: 1.4
 }
+
+export const amountPositiveStyle: CSSProperties = {
+  color: "#2f7a43",
+  fontWeight: 700
+}
+
+export const amountNegativeStyle: CSSProperties = {
+  color: "#9b3d32",
+  fontWeight: 700
+}
+
+export const amountNeutralStyle: CSSProperties = {
+  color: "#6b7280",
+  fontWeight: 700
+}
