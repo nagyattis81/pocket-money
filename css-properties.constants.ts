@@ -119,13 +119,49 @@ export const settingsGridStyle: CSSProperties = {
   marginTop: 8
 }
 
+export const settingsFieldStyle: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 0,
+  width: "100%"
+}
+
+export const settingsFieldLabelStyle: CSSProperties = {
+  minWidth: 28,
+  padding: "6px 8px",
+  textAlign: "center",
+  fontWeight: 600,
+  color: "black",
+  background: "#efe0bb",
+  border: "1px solid #d8c8a0",
+  borderRight: "none",
+  borderRadius: "8px 0 0 8px",
+  boxSizing: "border-box"
+}
+
 export const settingsInputStyle: CSSProperties = {
-  width: "100%",
+  flex: 1,
+  minWidth: 0,
   boxSizing: "border-box",
-  borderRadius: 8,
+  borderRadius: 0,
   border: "1px solid #d8c8a0",
   padding: "6px 8px",
   background: "#fffaf0"
+}
+
+export const settingsUnitStyle: CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  fontSize: 12,
+  fontWeight: 600,
+  color: "#6b7280",
+  whiteSpace: "nowrap",
+  padding: "6px 8px",
+  background: "#efe0bb",
+  border: "1px solid #d8c8a0",
+  borderLeft: "none",
+  borderRadius: "0 8px 8px 0",
+  boxSizing: "border-box"
 }
 
 export const settingsActionsStyle: CSSProperties = {
@@ -147,13 +183,6 @@ export const settingsStatusStyle: CSSProperties = {
   marginTop: 8,
   fontSize: 12,
   color: "#6b7280"
-}
-
-export const languageRowStyle: CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: 8,
-  marginTop: 8
 }
 
 export const languageSelectStyle: CSSProperties = {

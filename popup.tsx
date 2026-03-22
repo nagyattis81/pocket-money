@@ -16,13 +16,15 @@ import {
   headingStyle,
   hintStyle,
   itemListStyle,
-  languageRowStyle,
   settingsActionsStyle,
   settingsButtonStyle,
+  settingsFieldLabelStyle,
+  settingsFieldStyle,
   settingsGridStyle,
   settingsInputStyle,
   settingsPanelStyle,
   settingsStatusStyle,
+  settingsUnitStyle,
   summaryAmountsStyle,
   summaryControlsStyle,
   summaryStyle,
@@ -236,14 +238,15 @@ function IndexPopup() {
       <p style={textStyle}>{t(language, "settingsHint")}</p>
       <div style={settingsGridStyle}>
         {[1, 2, 3, 4, 5].map((grade) => (
-          <label key={grade}>
-            {grade}
+          <label key={grade} style={settingsFieldStyle}>
+            <span style={settingsFieldLabelStyle}>{grade}</span>
             <input
               type="number"
               value={gradeToAmount[grade] ?? 0}
               onChange={(event) => handleGradeValueChange(grade, event.target.value)}
               style={settingsInputStyle}
             />
+            <span style={settingsUnitStyle}>Ft</span>
           </label>
         ))}
       </div>
