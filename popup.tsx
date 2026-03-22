@@ -33,6 +33,7 @@ import {
 } from "./css-properties.constants"
 import {
   buildMonthSummaries,
+  calculateMonthAllFiveTotalWithMap,
   calculateAllFiveTotalWithMap,
   extractMonthlyEntries,
   formatAmount,
@@ -304,11 +305,12 @@ function IndexPopup() {
             <table style={tableStyle}>
               <thead>
                 <tr>
-                  <th style={headerCellStyle}>{t(language, "month")}</th>
+                  <th style={{ ...headerCellStyle, width:"1%" }}>{t(language, "month")}</th>
                   {tableViewMode === "detailed" ? (
                     <th style={headerCellStyle}>{t(language, "gradesAndWeights")}</th>
                   ) : null}
-                  <th style={headerCellStyle}>{t(language, "total")}</th>
+                  <th style={{ ...headerCellStyle, width:"1%" }}>{t(language, "total")}</th>
+                  <th style={{ ...headerCellStyle, width:"1%" }}>{t(language, "monthlyAllFive")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -343,7 +345,8 @@ function IndexPopup() {
                         )}
                       </td>
                     ) : null}
-                    <td style={bodyCellStyle}>{formatAmount(summary.total)}</td>
+                    <td style={{ ...bodyCellStyle, whiteSpace: "nowrap" }}>{formatAmount(summary.total)}</td>
+                    <td style={{ ...bodyCellStyle, whiteSpace: "nowrap" }}>{formatAmount(calculateMonthAllFiveTotalWithMap(summary, gradeToAmount))}</td>
                   </tr>
                 ))}
               </tbody>

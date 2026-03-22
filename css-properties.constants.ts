@@ -80,13 +80,14 @@ export const headerCellStyle: CSSProperties = {
   padding: "10px 12px",
   textAlign: "left",
   borderBottom: "2px solid #d6c7a1",
-  verticalAlign: "top"
+  verticalAlign: "top",
 }
 
 export const bodyCellStyle: CSSProperties = {
   padding: "10px 12px",
   borderBottom: "1px solid #eadfbe",
-  verticalAlign: "top"
+  verticalAlign: "top",
+  textAlign: "left",
 }
 
 export const itemListStyle: CSSProperties = {

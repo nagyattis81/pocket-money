@@ -11,6 +11,7 @@ export type TranslationKey =
   | "month"
   | "gradesAndWeights"
   | "total"
+  | "monthlyAllFive"
   | "noGrades"
   | "emptyTitle"
   | "emptyMessage"
@@ -41,6 +42,7 @@ const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
     month: "Hónap",
     gradesAndWeights: "Jegyek és súlyok",
     total: "Összesen",
+    monthlyAllFive: "Teljes",
     noGrades: "Nincs jegy",
     emptyTitle: "Nincs kiolvasható jegy",
     emptyMessage: "Nem találtam kiolvasható számjegyes 1-5 osztályzatokat a havi oszlopokban.",
@@ -70,6 +72,7 @@ const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
     month: "Month",
     gradesAndWeights: "Grades and weights",
     total: "Total",
+    monthlyAllFive: "Full",
     noGrades: "No grades",
     emptyTitle: "No readable grades",
     emptyMessage: "No readable numeric grades (1-5) were found in monthly columns.",

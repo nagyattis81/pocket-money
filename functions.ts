@@ -102,6 +102,18 @@ export function calculateAllFiveTotalWithMap(
   )
 }
 
+export function calculateMonthAllFiveTotalWithMap(
+  monthSummary: MonthSummary,
+  gradeToAmount: GradeToAmountMap
+) {
+  const allFiveBase = gradeToAmount[5] ?? DEFAULT_GRADE_TO_AMOUNT[5]
+
+  return monthSummary.entries.reduce(
+    (monthSum, entry) => monthSum + Math.round((allFiveBase * entry.weight) / 100),
+    0
+  )
+}
+
 export async function extractMonthlyEntries(
   tabId: number,
   gradeToAmount: GradeToAmountMap
