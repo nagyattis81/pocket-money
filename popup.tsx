@@ -229,29 +229,6 @@ function IndexPopup() {
 
   const renderSettingsPanel = () => (
     <section style={settingsPanelStyle}>
-      <div style={languageRowStyle}>
-        <button
-          type="button"
-          title={language === "hu" ? t(language, "languageHungarian") : t(language, "languageEnglish")}
-          onClick={handleLanguageChange}
-          style={flagButtonActiveStyle}>
-          {language === "hu" ? (
-            <svg width="28" height="18" viewBox="0 0 3 2" style={{ display: "block", borderRadius: 2 }}>
-              <rect width="3" height="0.667" fill="#CE2939" />
-              <rect width="3" height="0.667" y="0.667" fill="#FFFFFF" />
-              <rect width="3" height="0.667" y="1.333" fill="#477050" />
-            </svg>
-          ) : (
-            <svg width="28" height="18" viewBox="0 0 60 40" style={{ display: "block", borderRadius: 2 }}>
-              <rect width="60" height="40" fill="#012169" />
-              <path d="M0,0 L60,40 M60,0 L0,40" stroke="#fff" strokeWidth="8" />
-              <path d="M0,0 L60,40 M60,0 L0,40" stroke="#C8102E" strokeWidth="4" />
-              <path d="M30,0 V40 M0,20 H60" stroke="#fff" strokeWidth="12" />
-              <path d="M30,0 V40 M0,20 H60" stroke="#C8102E" strokeWidth="8" />
-            </svg>
-          )}
-        </button>
-      </div>
       <h2 style={headingStyle}>{t(language, "settingsTitle")}</h2>
       <p style={textStyle}>{t(language, "settingsHint")}</p>
       <div style={settingsGridStyle}>
@@ -323,6 +300,29 @@ function IndexPopup() {
                 )}
               </button>
             </div>
+            <div style={languageRowStyle}>
+              <button
+                type="button"
+                title={language === "hu" ? t(language, "languageHungarian") : t(language, "languageEnglish")}
+                onClick={handleLanguageChange}
+                style={flagButtonActiveStyle}>
+                {language === "hu" ? (
+                  <svg width="28" height="18" viewBox="0 0 3 2" style={{ display: "block", borderRadius: 2 }}>
+                    <rect width="3" height="0.667" fill="#CE2939" />
+                    <rect width="3" height="0.667" y="0.667" fill="#FFFFFF" />
+                    <rect width="3" height="0.667" y="1.333" fill="#477050" />
+                  </svg>
+                ) : (
+                  <svg width="28" height="18" viewBox="0 0 60 40" style={{ display: "block", borderRadius: 2 }}>
+                    <rect width="60" height="40" fill="#012169" />
+                    <path d="M0,0 L60,40 M60,0 L0,40" stroke="#fff" strokeWidth="8" />
+                    <path d="M0,0 L60,40 M60,0 L0,40" stroke="#C8102E" strokeWidth="4" />
+                    <path d="M30,0 V40 M0,20 H60" stroke="#fff" strokeWidth="12" />
+                    <path d="M30,0 V40 M0,20 H60" stroke="#C8102E" strokeWidth="8" />
+                  </svg>
+                )}
+              </button>
+            </div>            
             <table style={tableStyle}>
               <thead>
                 <tr>
