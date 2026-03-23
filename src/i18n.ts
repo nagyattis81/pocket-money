@@ -6,6 +6,7 @@ export type TranslationKey =
   | "loadingTitle"
   | "loadingMessage"
   | "summaryTitle"
+  | "settingsViewTitle"
   | "grandTotal"
   | "allFiveTotal"
   | "month"
@@ -38,6 +39,7 @@ const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
     loadingTitle: "Pocket Money",
     loadingMessage: "Az aktív lap ellenőrzése folyamatban van.",
     summaryTitle: "Havi zsebpénz összesítő",
+    settingsViewTitle: "Beállítások",
     grandTotal: "Végösszeg",
     allFiveTotal: "ha minden jegy 5-ös lenne",
     month: "Hónap",
@@ -46,9 +48,11 @@ const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
     monthlyAllFive: "Teljes",
     noGrades: "Nincs jegy",
     emptyTitle: "Nincs kiolvasható jegy",
-    emptyMessage: "Nem találtam kiolvasható számjegyes 1-5 osztályzatokat a havi oszlopokban.",
+    emptyMessage:
+      "Nem találtam kiolvasható számjegyes 1-5 osztályzatokat a havi oszlopokban.",
     unsupportedTitle: "Nem támogatott oldal",
-    unsupportedMessage: "A bővítmény csak az e-kreta Osztályzatok oldalon működik.",
+    unsupportedMessage:
+      "A bővítmény csak az e-kreta Osztályzatok oldalon működik.",
     unsupportedHintPrefix: "Nyisd meg ezt az útvonalat:",
     errorTitle: "Ellenőrzés sikertelen",
     missingTabId: "Az aktív lap azonosítója nem érhető el.",
@@ -69,6 +73,7 @@ const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
     loadingTitle: "Pocket Money",
     loadingMessage: "Checking the active tab.",
     summaryTitle: "Monthly pocket money summary",
+    settingsViewTitle: "Settings",
     grandTotal: "Grand total",
     allFiveTotal: "if every grade had been 5",
     month: "Month",
@@ -77,7 +82,8 @@ const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
     monthlyAllFive: "Full",
     noGrades: "No grades",
     emptyTitle: "No readable grades",
-    emptyMessage: "No readable numeric grades (1-5) were found in monthly columns.",
+    emptyMessage:
+      "No readable numeric grades (1-5) were found in monthly columns.",
     unsupportedTitle: "Unsupported page",
     unsupportedMessage: "The extension works only on the e-kreta Grades page.",
     unsupportedHintPrefix: "Open this path:",
@@ -99,12 +105,14 @@ const translations: Record<AppLanguage, Record<TranslationKey, string>> = {
 }
 
 export const detectLanguage = (): AppLanguage => {
-  const uiLanguage = chrome.i18n?.getUILanguage?.() ?? navigator.language ?? "en"
+  const uiLanguage =
+    chrome.i18n?.getUILanguage?.() ?? navigator.language ?? "en"
 
   return uiLanguage.toLowerCase().startsWith("hu") ? "hu" : "en"
 }
 
-export const normalizeLanguage = (value: unknown): AppLanguage => value === "hu" ? "hu" : "en"
+export const normalizeLanguage = (value: unknown): AppLanguage =>
+  value === "hu" ? "hu" : "en"
 
 export const getStoredLanguage = async (): Promise<AppLanguage | null> => {
   const stored = await chrome.storage.local.get(LANGUAGE_STORAGE_KEY)
@@ -123,4 +131,5 @@ export const saveLanguage = async (language: AppLanguage): Promise<void> => {
   })
 }
 
-export const t = (language: AppLanguage, key: TranslationKey): string => translations[language][key]
+export const t = (language: AppLanguage, key: TranslationKey): string =>
+  translations[language][key]

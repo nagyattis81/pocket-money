@@ -353,7 +353,7 @@ const IndexPopup = (): React.JSX.Element => {
       case "ready":
         return (
           <>
-            <h1 style={headingStyle}>{t(language, "summaryTitle")}</h1>
+            <h1 style={headingStyle}>{t(language, isSettingsOpen ? "settingsViewTitle" : "summaryTitle")}</h1>
             <div style={summaryStyle}>
               <div style={summaryAmountsStyle}>
                 {t(language, "grandTotal")}: <strong>{formatAmount(popupState.grandTotal, currency)}</strong> | {t(language, "allFiveTotal")}:{" "}
@@ -384,56 +384,59 @@ const IndexPopup = (): React.JSX.Element => {
                 </button>
               </div>
             </div>
-            {isSettingsOpen ? renderSettingsPanel() : null}
-            <table style={tableStyle}>
-              <thead>
-                <tr>
-                  <th style={{ ...headerCellStyle, width:"1%" }}>{t(language, "month")}</th>
-                  {tableViewMode === "detailed" ? (
-                    <th style={headerCellStyle}>{t(language, "gradesAndWeights")}</th>
-                  ) : null}
-                  <th style={{ ...headerCellStyle, width:"1%" }}>{t(language, "total")}</th>
-                  <th style={{ ...headerCellStyle, width:"1%" }}>{t(language, "monthlyAllFive")}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {popupState.monthSummaries.filter((summary: MonthSummary) => summary.entries.length > 0).map((summary: MonthSummary) => (
-                  <tr key={summary.month}>
-                    <td style={bodyCellStyle}>{summary.month}</td>
+            {isSettingsOpen ? (
+              renderSettingsPanel()
+            ) : (
+              <table style={tableStyle}>
+                <thead>
+                  <tr>
+                    <th style={{ ...headerCellStyle, width:"1%" }}>{t(language, "month")}</th>
                     {tableViewMode === "detailed" ? (
-                      <td style={bodyCellStyle}>
-                        {summary.entries.length > 0 ? (
-                          <div style={itemListStyle}>
-                            {summary.entries.map((entry: GradeEntry, index: number) => (
-                              <span
-                                key={`${summary.month}-${entry.subject}-${entry.date}-${index}`}
-                                style={badgeStyle}>
-                                {entry.subject}: {entry.grade} ({entry.weight}%)
-                                {" "}
-                                <span
-                                  style={
-                                    entry.amount > 0
-                                      ? amountPositiveStyle
-                                      : entry.amount < 0
-                                        ? amountNegativeStyle
-                                        : amountNeutralStyle
-                                  }>
-                                  {formatAmount(entry.amount, currency)}
-                                </span>
-                              </span>
-                            ))}
-                          </div>
-                        ) : (
-                          <span style={hintStyle}>{t(language, "noGrades")}</span>
-                        )}
-                      </td>
+                      <th style={headerCellStyle}>{t(language, "gradesAndWeights")}</th>
                     ) : null}
-                    <td style={{ ...bodyCellStyle, whiteSpace: "nowrap" }}>{formatAmount(summary.total, currency)}</td>
-                    <td style={{ ...bodyCellStyle, whiteSpace: "nowrap" }}>{formatAmount(calculateMonthAllFiveTotalWithMap(summary, gradeToAmount), currency)}</td>
+                    <th style={{ ...headerCellStyle, width:"1%" }}>{t(language, "total")}</th>
+                    <th style={{ ...headerCellStyle, width:"1%" }}>{t(language, "monthlyAllFive")}</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {popupState.monthSummaries.filter((summary: MonthSummary) => summary.entries.length > 0).map((summary: MonthSummary) => (
+                    <tr key={summary.month}>
+                      <td style={bodyCellStyle}>{summary.month}</td>
+                      {tableViewMode === "detailed" ? (
+                        <td style={bodyCellStyle}>
+                          {summary.entries.length > 0 ? (
+                            <div style={itemListStyle}>
+                              {summary.entries.map((entry: GradeEntry, index: number) => (
+                                <span
+                                  key={`${summary.month}-${entry.subject}-${entry.date}-${index}`}
+                                  style={badgeStyle}>
+                                  {entry.subject}: {entry.grade} ({entry.weight}%)
+                                  {" "}
+                                  <span
+                                    style={
+                                      entry.amount > 0
+                                        ? amountPositiveStyle
+                                        : entry.amount < 0
+                                          ? amountNegativeStyle
+                                          : amountNeutralStyle
+                                    }>
+                                    {formatAmount(entry.amount, currency)}
+                                  </span>
+                                </span>
+                              ))}
+                            </div>
+                          ) : (
+                            <span style={hintStyle}>{t(language, "noGrades")}</span>
+                          )}
+                        </td>
+                      ) : null}
+                      <td style={{ ...bodyCellStyle, whiteSpace: "nowrap" }}>{formatAmount(summary.total, currency)}</td>
+                      <td style={{ ...bodyCellStyle, whiteSpace: "nowrap" }}>{formatAmount(calculateMonthAllFiveTotalWithMap(summary, gradeToAmount), currency)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </>
         )
       case "empty":
