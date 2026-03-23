@@ -52,7 +52,7 @@ import {
   saveGradeToAmount,
   saveTableViewMode
 } from "./functions"
-import { CompactViewIcon, DetailedViewIcon, EnFlagIcon, HuFlagIcon } from "./icons"
+import { CompactViewIcon, DetailedViewIcon, EnFlagIcon, HuFlagIcon, SettingsIcon } from "./icons"
 import { detectLanguage, getStoredLanguage, saveLanguage, t } from "./i18n"
 import type { AppLanguage } from "./i18n"
 import type { CurrencyCode, GradeEntry, GradeToAmountMap, MonthSummary, PopupState, SettingsStatus, TableViewMode } from "./types"
@@ -87,6 +87,7 @@ const IndexPopup = (): React.JSX.Element => {
   const [gradeToAmount, setGradeToAmount] = useState<GradeToAmountMap>({ ...DEFAULT_GRADE_TO_AMOUNT })
   const [tableViewMode, setTableViewMode] = useState<TableViewMode>("compact")
   const [settingsStatus, setSettingsStatus] = useState<SettingsStatus>("idle")
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [language, setLanguage] = useState<AppLanguage>(detectLanguage())
   const [currency, setCurrency] = useState<CurrencyCode>(DEFAULT_CURRENCY)
 
@@ -292,6 +293,10 @@ const IndexPopup = (): React.JSX.Element => {
     }
   }
 
+  const handleSettingsToggle = () => {
+    setIsSettingsOpen((prev: boolean) => !prev)
+  }
+
   const renderSettingsPanel = () => (
     <section style={settingsPanelStyle}>
       <h2 style={headingStyle}>{t(language, "settingsTitle")}</h2>
@@ -369,8 +374,17 @@ const IndexPopup = (): React.JSX.Element => {
                   style={flagButtonActiveStyle}>
                   {language === "hu" ? <HuFlagIcon /> : <EnFlagIcon />}
                 </button>
+                <button
+                  type="button"
+                  title={t(language, "settingsTitle")}
+                  aria-label={t(language, "settingsTitle")}
+                  onClick={handleSettingsToggle}
+                  style={flagButtonActiveStyle}>
+                  <SettingsIcon />
+                </button>
               </div>
             </div>
+            {isSettingsOpen ? renderSettingsPanel() : null}
             <table style={tableStyle}>
               <thead>
                 <tr>
@@ -420,7 +434,6 @@ const IndexPopup = (): React.JSX.Element => {
                 ))}
               </tbody>
             </table>
-            {renderSettingsPanel()}
           </>
         )
       case "empty":
