@@ -6,39 +6,11 @@ import {
   SUPPORTED_PATH
 } from "./constants"
 import {
-  amountNegativeStyle,
-  amountNeutralStyle,
-  amountPositiveStyle,
-  badgeStyle,
-  bodyCellStyle,
-  cardStyle,
-  containerStyle,
-  flagButtonActiveStyle,
-  headerCellStyle,
-  headingStyle,
-  hintStyle,
-  itemListStyle,
-  settingsActionsStyle,
-  settingsButtonStyle,
-  settingsCurrencyGroupStyle,
-  settingsCurrencyPrefixStyle,
-  settingsCurrencySelectStyle,
-  settingsFieldLabelStyle,
-  settingsFieldStyle,
-  settingsGridStyle,
-  settingsInputStyle,
-  settingsPanelStyle,
-  settingsStatusStyle,
-  settingsUnitStyle,
-  summaryAmountsStyle,
-  summaryControlsStyle,
-  summaryStyle,
-  tableStyle,
-  textStyle
+  hintStyle
 } from "./css-properties.constants"
+import { cardStyle, containerStyle } from "./popup.styles"
 import {
   buildMonthSummaries,
-  calculateMonthAllFiveTotalWithMap,
   calculateAllFiveTotalWithMap,
   extractMonthlyEntries,
   formatAmount,
@@ -52,10 +24,13 @@ import {
   saveGradeToAmount,
   saveTableViewMode
 } from "./functions"
-import { CompactViewIcon, DetailedViewIcon, EnFlagIcon, HuFlagIcon, SettingsIcon } from "./icons"
 import { detectLanguage, getStoredLanguage, saveLanguage, t } from "./i18n"
-import type { AppLanguage } from "./i18n"
-import type { CurrencyCode, GradeEntry, GradeToAmountMap, MonthSummary, PopupState, SettingsStatus, TableViewMode } from "./types"
+import type { AppLanguage, TranslationKey } from "./i18n"
+import { MonthSummaryTable } from "./components/month-summary-table"
+import { EmptyView, ErrorView, LoadingView, UnsupportedView } from "./components/popup-status-views"
+import { SettingsPanel } from "./components/settings-panel"
+import { SummaryHeader } from "./components/summary-header"
+import type { CurrencyCode, GradeToAmountMap, MonthSummary, PopupState, SettingsStatus, TableViewMode } from "./types"
 
 const FALLBACK_CURRENCIES: CurrencyCode[] = ["HUF", "EUR", "USD"]
 
@@ -297,176 +272,78 @@ const IndexPopup = (): React.JSX.Element => {
     setIsSettingsOpen((prev: boolean) => !prev)
   }
 
-  const renderSettingsPanel = () => (
-    <section style={settingsPanelStyle}>
-      <h2 style={headingStyle}>{t(language, "settingsTitle")}</h2>
-      <p style={textStyle}>{t(language, "settingsHint")}</p>
-      <div style={settingsGridStyle}>
-        {[1, 2, 3, 4, 5].map((grade: number) => (
-          <label key={grade} style={settingsFieldStyle}>
-            <span style={settingsFieldLabelStyle}>{grade}</span>
-            <input
-              type="number"
-              value={gradeToAmount[grade] ?? 0}
-              onChange={(event: React.ChangeEvent<HTMLInputElement>) => handleGradeValueChange(grade, event.target.value)}
-              style={settingsInputStyle}
-            />
-            <span style={settingsUnitStyle}>{currency === "HUF" ? "Ft" : currency}</span>
-          </label>
-        ))}
-      </div>
-      <div style={settingsCurrencyGroupStyle}>
-        <span style={settingsCurrencyPrefixStyle}>{t(language, "currencyLabel")}</span>
-        <select value={currency} onChange={handleCurrencyChange} style={settingsCurrencySelectStyle}>
-          {getCurrencyOptions(language).map((item: { code: CurrencyCode; label: string }) => (
-            <option key={item.code} value={item.code}>
-              {item.label}
-            </option>
-          ))}
-        </select>
-      </div>
-      <div style={settingsActionsStyle}>
-        <button type="button" onClick={handleSaveSettings} style={settingsButtonStyle}>
-          {t(language, "saveSettings")}
-        </button>
-        <button type="button" onClick={handleResetDefaults} style={settingsButtonStyle}>
-          {t(language, "resetDefaults")}
-        </button>
-      </div>
-      {settingsStatus === "saved" ? (
-        <div style={settingsStatusStyle}>{t(language, "settingsSaved")}</div>
-      ) : settingsStatus === "error" ? (
-        <div style={settingsStatusStyle}>{t(language, "settingsSaveFailed")}</div>
-      ) : null}
-    </section>
+  const settingsPanel = (
+    <SettingsPanel
+      gradeToAmount={gradeToAmount}
+      currency={currency}
+      settingsStatus={settingsStatus}
+      currencyOptions={getCurrencyOptions(language)}
+      onGradeValueChange={handleGradeValueChange}
+      onCurrencyChange={handleCurrencyChange}
+      onSaveSettings={handleSaveSettings}
+      onResetDefaults={handleResetDefaults}
+      t={(key: TranslationKey) => t(language, key)}
+    />
   )
 
   const renderContent = () => {
     switch (popupState.status) {
       case "loading":
-        return (
-          <>
-            <h1 style={headingStyle}>{t(language, "loadingTitle")}</h1>
-            <p style={textStyle}>{t(language, "loadingMessage")}</p>
-          </>
-        )
+        return <LoadingView t={(key: TranslationKey) => t(language, key)} />
       case "ready":
         return (
           <>
-            <h1 style={headingStyle}>{t(language, isSettingsOpen ? "settingsViewTitle" : "summaryTitle")}</h1>
-            <div style={summaryStyle}>
-              <div style={summaryAmountsStyle}>
-                {t(language, "grandTotal")}: <strong>{formatAmount(popupState.grandTotal, currency)}</strong> | {t(language, "allFiveTotal")}:{" "}
-                <strong>{formatAmount(popupState.allFiveTotal, currency)}</strong>
-              </div>
-              <div style={summaryControlsStyle}>
-                <button
-                  type="button"
-                  title={tableViewMode === "compact" ? t(language, "tableViewCompact") : t(language, "tableViewDetailed")}
-                  onClick={handleTableViewModeChange}
-                  style={flagButtonActiveStyle}>
-                  {tableViewMode === "compact" ? <CompactViewIcon /> : <DetailedViewIcon />}
-                </button>
-                <button
-                  type="button"
-                  title={language === "hu" ? t(language, "languageHungarian") : t(language, "languageEnglish")}
-                  onClick={handleLanguageChange}
-                  style={flagButtonActiveStyle}>
-                  {language === "hu" ? <HuFlagIcon /> : <EnFlagIcon />}
-                </button>
-                <button
-                  type="button"
-                  title={t(language, "settingsTitle")}
-                  aria-label={t(language, "settingsTitle")}
-                  onClick={handleSettingsToggle}
-                  style={flagButtonActiveStyle}>
-                  <SettingsIcon />
-                </button>
-              </div>
-            </div>
+            <SummaryHeader
+              isSettingsOpen={isSettingsOpen}
+              language={language}
+              tableViewMode={tableViewMode}
+              grandTotal={popupState.grandTotal}
+              allFiveTotal={popupState.allFiveTotal}
+              currency={currency}
+              onTableViewModeChange={handleTableViewModeChange}
+              onLanguageChange={handleLanguageChange}
+              onSettingsToggle={handleSettingsToggle}
+              t={(key: TranslationKey) => t(language, key)}
+              formatAmount={formatAmount}
+            />
             {isSettingsOpen ? (
-              renderSettingsPanel()
+              settingsPanel
             ) : (
-              <table style={tableStyle}>
-                <thead>
-                  <tr>
-                    <th style={{ ...headerCellStyle, width:"1%" }}>{t(language, "month")}</th>
-                    {tableViewMode === "detailed" ? (
-                      <th style={headerCellStyle}>{t(language, "gradesAndWeights")}</th>
-                    ) : null}
-                    <th style={{ ...headerCellStyle, width:"1%" }}>{t(language, "total")}</th>
-                    <th style={{ ...headerCellStyle, width:"1%" }}>{t(language, "monthlyAllFive")}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {popupState.monthSummaries.filter((summary: MonthSummary) => summary.entries.length > 0).map((summary: MonthSummary) => (
-                    <tr key={summary.month}>
-                      <td style={bodyCellStyle}>{summary.month}</td>
-                      {tableViewMode === "detailed" ? (
-                        <td style={bodyCellStyle}>
-                          {summary.entries.length > 0 ? (
-                            <div style={itemListStyle}>
-                              {summary.entries.map((entry: GradeEntry, index: number) => (
-                                <span
-                                  key={`${summary.month}-${entry.subject}-${entry.date}-${index}`}
-                                  style={badgeStyle}>
-                                  {entry.subject}: {entry.grade} ({entry.weight}%)
-                                  {" "}
-                                  <span
-                                    style={
-                                      entry.amount > 0
-                                        ? amountPositiveStyle
-                                        : entry.amount < 0
-                                          ? amountNegativeStyle
-                                          : amountNeutralStyle
-                                    }>
-                                    {formatAmount(entry.amount, currency)}
-                                  </span>
-                                </span>
-                              ))}
-                            </div>
-                          ) : (
-                            <span style={hintStyle}>{t(language, "noGrades")}</span>
-                          )}
-                        </td>
-                      ) : null}
-                      <td style={{ ...bodyCellStyle, whiteSpace: "nowrap" }}>{formatAmount(summary.total, currency)}</td>
-                      <td style={{ ...bodyCellStyle, whiteSpace: "nowrap" }}>{formatAmount(calculateMonthAllFiveTotalWithMap(summary, gradeToAmount), currency)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <MonthSummaryTable
+                monthSummaries={popupState.monthSummaries}
+                tableViewMode={tableViewMode}
+                currency={currency}
+                gradeToAmount={gradeToAmount}
+                t={(key: TranslationKey) => t(language, key)}
+              />
             )}
           </>
         )
       case "empty":
         return (
-          <>
-            <h1 style={headingStyle}>{t(language, "emptyTitle")}</h1>
-            <p style={textStyle}>{popupState.message}</p>
-            <p style={hintStyle}>{popupState.url}</p>
-            {renderSettingsPanel()}
-          </>
+          <EmptyView
+            t={(key: TranslationKey) => t(language, key)}
+            message={popupState.message}
+            url={popupState.url}
+            settingsPanel={settingsPanel}
+          />
         )
       case "unsupported":
         return (
-          <>
-            <h1 style={headingStyle}>{t(language, "unsupportedTitle")}</h1>
-            <p style={textStyle}>{t(language, "unsupportedMessage")}</p>
-            <p style={hintStyle}>
-              {t(language, "unsupportedHintPrefix")} https://*.e-kreta.hu{SUPPORTED_PATH}
-            </p>
-            {popupState.url ? <p style={hintStyle}>{popupState.url}</p> : null}
-            {renderSettingsPanel()}
-          </>
+          <UnsupportedView
+            t={(key: TranslationKey) => t(language, key)}
+            supportedPath={SUPPORTED_PATH}
+            url={popupState.url}
+            settingsPanel={settingsPanel}
+          />
         )
       case "error":
         return (
-          <>
-            <h1 style={headingStyle}>{t(language, "errorTitle")}</h1>
-            <p style={textStyle}>{popupState.message}</p>
-            {renderSettingsPanel()}
-          </>
+          <ErrorView
+            t={(key: TranslationKey) => t(language, key)}
+            message={popupState.message}
+            settingsPanel={settingsPanel}
+          />
         )
     }
   }
